@@ -64,7 +64,9 @@ export default class MyPlugin extends Plugin {
 
 	async create_new_sticky_note() {
 		const root = this.app.vault.getRoot().path;
-		const filename = 'Sticky Note';
+		// const timestamp = new Date().toLocaleString().replace(/[/\\:]/g, '-');
+		const timestamp = Date.now();
+		const filename = `${timestamp}`;
 		const path = `${root}Sticky Notes/${filename}.md`;
 		console.log(`${path}`);
 		const created_note = await this.app.vault.create(path, "");

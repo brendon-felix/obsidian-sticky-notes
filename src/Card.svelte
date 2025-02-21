@@ -63,8 +63,8 @@
     const lastElText = element.children[lastBlockIndex].lastChild?.textContent;
     if (lastElText != null) {
       const lastChild = element.children[lastBlockIndex].lastChild;
-      assert(!is<null>(lastChild));
-      assert(!is<null>(lastElText));
+      // assert(!is<null>(lastChild));
+      // assert(!is<null>(lastElText));
       const cut = Math.min(50, 200 - (charCount - lastElText.length));
       lastChild.textContent = `${lastElText.slice(0, cut)} ...`;
     }
@@ -110,6 +110,8 @@
     word-wrap: break-word;
     overflow-y: hidden;
     margin: 0;
+    width: 300px;
+    height: 250px;
   }
 
   .card {

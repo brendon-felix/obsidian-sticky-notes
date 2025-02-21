@@ -12,7 +12,7 @@
   onMount(() => {
     grid = new MiniMasonry({
       container: cardsContainer,
-      baseWidth: 300,
+      baseWidth: 250,
       gutter: 20,
       surroundingGutter: false,
       ultimateGutter: 20,
@@ -63,9 +63,6 @@
 
 </script>
 
-<div class="number">
-  <span>Text</span>
-</div>
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path + file.stat.mtime)}
     <Card {file} {updateLayoutNextTick} />
