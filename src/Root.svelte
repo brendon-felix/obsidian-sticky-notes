@@ -25,6 +25,42 @@
     };
   });
 
+  let lastLayout: Date = new Date();
+  let pendingLayout: NodeJS.Timeout | null = null;
+  const debouncedLayout = () => {
+    // If there has been a relayout call in the last 100ms,
+    // we schedule another one 100ms later to avoid layout thrashing
+    return new Promise<void>((resolve) => {
+      if (
+        lastLayout.getTime() + 100 > new Date().getTime() &&
+        pendingLayout === null
+      ) {
+        pendingLayout = setTimeout(
+          () => {
+            grid.layout();
+            lastLayout = new Date();
+            pendingLayout = null;
+            resolve();
+          },
+          lastLayout.getTime() + 100 - new Date().getTime(),
+        );
+        return;
+      }
+
+      // Otherwise, relayout immediately
+      grid.layout();
+      lastLayout = new Date();
+      resolve();
+    });
+
+    
+  };
+  const updateLayoutNextTick = async () => {
+    await tick();
+    return await debouncedLayout();
+  };
+  displayedFiles.subscribe(updateLayoutNextTick);
+
 </script>
 
 <div class="number">
@@ -32,7 +68,7 @@
 </div>
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path + file.stat.mtime)}
-    <Card {file} />
+    <Card {file} {updateLayoutNextTick} />
   {/each}
 </div>
 

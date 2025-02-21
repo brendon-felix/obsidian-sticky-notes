@@ -13,10 +13,10 @@
 
   interface Props {
     file: TFile;
-    // updateLayoutNextTick: () => Promise<void>;
+    updateLayoutNextTick: () => Promise<void>;
   }
 
-  let { file }: Props = $props();
+  let { file, updateLayoutNextTick }: Props = $props();
 
   let contentDiv: HTMLElement;
   let displayFilename: boolean = $state(true);
@@ -30,8 +30,9 @@
       // Otherwise, the post processor will be applied to all files
       return;
     }
-
-
+    if (element.children.length === 0) {
+      return;
+    }
     // Find block where to cut the preview
     let lastBlockIndex: number = 0,
       charCount: number = 0;
@@ -171,6 +172,7 @@
   }
 
   .card:hover {
+    /* background-color: var(--background-modifier-hover); */
     border-color: var(--background-modifier-border-hover);
   }
 
