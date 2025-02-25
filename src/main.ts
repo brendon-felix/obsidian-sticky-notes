@@ -1,3 +1,17 @@
+
+// TODO: Store state of note order, color, etc.
+// TODO: Figure out a better format for automatic titles
+//   TODO: Add setting to configure automatic title format
+// TODO: Create menu for selecting note color
+// TODO: Improve layout, possibly use a single column
+// TODO: Fix border highlight on hover
+// TODO: Create a new note button
+// TODO: Add a search bar
+// TODO: Implement in-card editing
+// TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
+// TODO: Add drag and drop functionality to reorder notes
+// TODO: Add drag and drop functionality to trash notes
+
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, ItemView, WorkspaceLeaf, TFile } from 'obsidian';
 import { derived, get, writable } from "svelte/store";
 import { StickyNotesView, VIEW_TYPE } from "./view";
