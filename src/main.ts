@@ -115,7 +115,7 @@ class StickyNotesSettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		containerEl.createEl("h2", {
-			text: "Options for File Chucker",
+			text: "Sticky Notes Settings",
 		});
 
 		new Setting(this.containerEl)
