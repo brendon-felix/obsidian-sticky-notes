@@ -61,11 +61,13 @@
   };
   displayedFiles.subscribe(updateLayoutNextTick);
 
+  const defaultColor = "#FFD700";
+
 </script>
 
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path + file.stat.mtime)}
-    <Card {file} {updateLayoutNextTick} />
+    <Card {file} {updateLayoutNextTick} {defaultColor} />
   {/each}
 </div>
 

@@ -7,6 +7,7 @@
     TFile,
   } from "obsidian";
   import { onMount } from "svelte";
+  import { fly } from "svelte/transition";
   import { app, view } from "./store";
   import { assert, is } from "tsafe";
 
@@ -14,12 +15,14 @@
   interface Props {
     file: TFile;
     updateLayoutNextTick: () => Promise<void>;
+    color?: string;
+    defaultColor: string;
   }
 
-  let { file, updateLayoutNextTick }: Props = $props();
+  let { file, updateLayoutNextTick, color, defaultColor }: Props = $props();
 
   let contentDiv: HTMLElement;
-  let displayFilename: boolean = $state(true);
+  let translateTransition: boolean = $state(false);
 
   function postProcessor(
     element: HTMLElement,
@@ -63,8 +66,8 @@
     const lastElText = element.children[lastBlockIndex].lastChild?.textContent;
     if (lastElText != null) {
       const lastChild = element.children[lastBlockIndex].lastChild;
-      // assert(!is<null>(lastChild));
-      // assert(!is<null>(lastElText));
+      assert(!is<null>(lastChild));
+      assert(!is<null>(lastElText));
       const cut = Math.min(50, 200 - (charCount - lastElText.length));
       lastChild.textContent = `${lastElText.slice(0, cut)} ...`;
     }
@@ -77,13 +80,21 @@
     MarkdownPreviewRenderer.unregisterPostProcessor(postProcessor);
   };
 
+  const trashFile = async (e: Event) => {
+    e.stopPropagation();
+    await file.vault.trash(file, true);
+    await updateLayoutNextTick();
+  };
+
   const openFile = async () =>
     await $app.workspace.getLeaf("tab").openFile(file);
+
+  const trashIcon = (element: HTMLElement) => setIcon(element, "trash");
 
   onMount(() => {
     (async () => {
       await renderFile(contentDiv);
-      // await updateLayoutNextTick();
+      await updateLayoutNextTick();
       translateTransition = true;
     })();
     return () => updateLayoutNextTick();
@@ -93,12 +104,23 @@
 
 <div
   class="card"
+  class:transition={translateTransition}
+  transition:fly
   onclick={openFile}
   role="link"
   onkeydown={openFile}
   tabindex="0"
+  style="border-color: {color || defaultColor};"
 >
   <div bind:this={contentDiv}></div>
+  <div class="card-menu">
+    <button
+      class="clickable-icon"
+      use:trashIcon
+      onclick={trashFile}
+      aria-label="Delete file"
+    ></button>
+  </div>
 </div>
 
 <style>
@@ -112,6 +134,11 @@
     margin: 0;
     width: 300px;
     height: 250px;
+  }
+
+  .card.transition {
+    transition-property: transform;
+    transition-duration: 0.2s;
   }
 
   .card {
@@ -175,11 +202,60 @@
 
   .card:hover {
     /* background-color: var(--background-modifier-hover); */
-    border-color: var(--background-modifier-border-hover);
+    border-color: var(--border-color-hover);
   }
 
   .card :global(h3) {
     word-wrap: break-word;
   }
+
+  /* .card .card-menu {
+    margin: calc(-1 * var(--card-padding));
+    margin-top: 0;
+    border-top: 1px solid var(--background-modifier-border);
+    padding: var(--size-4-1) var(--card-padding);
+    background-color: var(--background-primary);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-4-1);
+  } */
+
+  .card .card-menu {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    /* width: 20px; */
+    /* height: 20px; */
+    /* background-color: red; */
+    display: none;
+    /* cursor: pointer; */
+  }
+
+
+  .card:hover .card-menu {
+    display: block;
+  }
+
+  /* .card .card-menu .clickable-icon {
+    color: var(--tab-text-color-focused-active);
+    background-color: var(--background-modifier-hover);
+  } */
+
+  /* .delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    display: none;
+    cursor: pointer;
+  }
+
+  .card:hover .delete-button {
+    display: block;
+  } */
 
 </style>

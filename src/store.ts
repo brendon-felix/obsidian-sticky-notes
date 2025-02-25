@@ -13,7 +13,7 @@ export enum Sort {
 
 export const app = writable<App>();
 export const view = writable<ItemView>();
-
+// export const appCache = writable<MetadataCache>();
 export const files = writable<TFile[]>([]);
 export const sort = writable<Sort>(Sort.Modified);
 

@@ -1,28 +1,28 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, ItemView, WorkspaceLeaf, TFile } from 'obsidian';
 import { derived, get, writable } from "svelte/store";
-import { ExampleView, VIEW_TYPE_EXAMPLE } from "./view";
+import { StickyNotesView, VIEW_TYPE } from "./view";
 import store from "./store";
 
-// Remember to rename these classes and interfaces!
+import { FolderSuggest } from "./FolderSuggestor";
 
-interface MyPluginSettings {
-	mySetting: string;
+interface StickyNotesSettings {
+	sticky_notes_folder: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+const DEFAULT_SETTINGS: StickyNotesSettings = {
+	sticky_notes_folder: "",
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class StickyNotesPlugin extends Plugin {
+	settings: StickyNotesSettings;
 
 	async onload() {
 		await this.loadSettings();
 		store.app.set(this.app);
 
 		this.registerView(
-			VIEW_TYPE_EXAMPLE,
-			(leaf) => new ExampleView(leaf)
+			VIEW_TYPE,
+			(leaf) => new StickyNotesView(leaf, this)
 		);
 
 		// This creates an icon in the left ribbon.
@@ -46,7 +46,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new StickyNotesSettingsTab(this.app, this));
 
 		// // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// // Using this function will automatically remove the event listener when this plugin is disabled.
@@ -80,13 +80,13 @@ export default class MyPlugin extends Plugin {
 		const { workspace } = this.app;
 
 		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE);
 		
 		if (leaves.length > 0) {
 			leaf = leaves[0];
 		} else {
 			leaf = workspace.getLeaf(false);
-			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
+			await leaf.setViewState({ type: VIEW_TYPE, active: true });
 		}
 		workspace.revealLeaf(leaf);
 	}
@@ -100,28 +100,37 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+class StickyNotesSettingsTab extends PluginSettingTab {
+	plugin: StickyNotesPlugin;
+
+	constructor(app: App, plugin: StickyNotesPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+		containerEl.createEl("h2", {
+			text: "Options for File Chucker",
+		});
+
+		new Setting(this.containerEl)
+            .setName("Sticky Notes folder location")
+            .setDesc("Sticky notes are created and viewed here.")
+            .addSearch((cb) => {
+                new FolderSuggest(this.app, cb.inputEl);
+                cb.setPlaceholder("Example: folder1/folder2")
+                    .setValue(this.plugin.settings.sticky_notes_folder)
+                    .onChange((new_folder) => {
+                        this.plugin.settings.sticky_notes_folder = new_folder;
+                        this.plugin.saveSettings();
+                    });
+                // @ts-ignore
+                cb.containerEl.addClass("templater_search");
+            });
 	}
 }
