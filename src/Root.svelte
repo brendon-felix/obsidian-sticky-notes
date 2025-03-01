@@ -27,7 +27,7 @@
 
   let lastLayout: Date = new Date();
   let pendingLayout: NodeJS.Timeout | null = null;
-  const debouncedLayout = () => {
+  export const debouncedLayout = () => {
     // If there has been a relayout call in the last 100ms,
     // we schedule another one 100ms later to avoid layout thrashing
     return new Promise<void>((resolve) => {
@@ -55,7 +55,7 @@
 
     
   };
-  const updateLayoutNextTick = async () => {
+  export const updateLayoutNextTick = async () => {
     await tick();
     return await debouncedLayout();
   };

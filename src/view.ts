@@ -8,7 +8,7 @@ import StickyNotesPlugin from "./main";
 export const VIEW_TYPE = 'sticky-notes-view';
 
 export class StickyNotesView extends ItemView {
-    // counter: ReturnType<typeof Root> | undefined;
+    root: ReturnType<typeof Root> | undefined;
 	plugin: StickyNotesPlugin;
 
 	constructor(leaf: WorkspaceLeaf, plugin: StickyNotesPlugin) {
@@ -22,6 +22,10 @@ export class StickyNotesView extends ItemView {
 
 	getDisplayText() {
 		return 'Sticky Notes';
+	}
+
+	onResize() {
+		this.root?.updateLayoutNextTick();
 	}
 
 	async onOpen() {
@@ -74,7 +78,7 @@ export class StickyNotesView extends ItemView {
 		  );
         // store.displayedCount.set(50);
         console.log(get(store.displayedFiles));
-        mount(Root, {target: viewContent});
+        this.root = mount(Root, {target: viewContent});
 
 		viewContent.addEventListener("scroll", async () => {
 			if (
