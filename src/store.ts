@@ -32,7 +32,6 @@ export const loadColorMap = () => {
 export const saveColor = (filePath: string, color: string) => {
     colorMap[filePath] = color;
     saveColorMap();
-	console.log(colorMap);
 };
 
 export const loadColor = (filePath: string): string | undefined => {

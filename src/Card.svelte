@@ -90,8 +90,8 @@
   // const openFile = async () =>
   //   await $app.workspace.getLeaf("tab").openFile(file);
 
-  const openFile = async () => {}
-    // await $app.workspace.getLeaf("tab").openFile(file);
+  const openFile = async () =>
+    await $app.workspace.getLeaf("tab").openFile(file);
 
   const trashIcon = (element: HTMLElement) => setIcon(element, "trash");
 
@@ -117,7 +117,7 @@
   class="card"
   class:transition={translateTransition}
   transition:blur
-  onclick={openFile}
+  ondblclick={openFile}
   role="link"
   onkeydown={openFile}
   tabindex="0"
