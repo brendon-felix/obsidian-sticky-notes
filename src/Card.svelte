@@ -150,6 +150,7 @@
     position: absolute;
     background-color: var(--background-primary-alt);
     border: 1px solid var(--background-modifier-border);
+    border-top-width: 5px;
     padding: var(--card-padding);
     word-wrap: break-word;
     overflow-y: hidden;
