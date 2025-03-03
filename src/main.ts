@@ -12,7 +12,10 @@
 // TODO: Add drag and drop functionality to reorder notes
 // TODO: Add drag and drop functionality to trash notes
 
+// FIX: Layout is updated in the background while view port is 0 x 0
+// 		which causes invalid layouts (all stacked on top of each other)
 // FIX: Border highlight on hover
+// FIX: Finishing implementing set frontmatter color property
 
 import {
 	App,
@@ -22,16 +25,18 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import { StickyNotesView, VIEW_TYPE } from "./view";
-import store, { loadColorMap } from "./store";
+import store, { loadColorMap, settings } from "./store";
 
 import { FolderSuggest } from "./FolderSuggestor";
 
-interface StickyNotesSettings {
+export interface StickyNotesSettings {
 	sticky_notes_folder: string;
+	set_color_in_frontmatter: boolean;
 }
 
 export const DEFAULT_SETTINGS: StickyNotesSettings = {
 	sticky_notes_folder: "",
+	set_color_in_frontmatter: false,
 }
 
 export default class StickyNotesPlugin extends Plugin {
@@ -40,6 +45,7 @@ export default class StickyNotesPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		store.app.set(this.app);
+		settings.set(this.settings);
 		loadColorMap(); // Load the colorMap when the plugin is loaded
 
 		this.registerView(
@@ -112,6 +118,7 @@ export default class StickyNotesPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		settings.set(this.settings);
 	}
 }
 
@@ -147,5 +154,17 @@ class StickyNotesSettingsTab extends PluginSettingTab {
                 // @ts-ignore
                 cb.containerEl.addClass("templater_search");
             });
+
+		new Setting(this.containerEl)
+			.setName("Set color in frontmatter")
+			.setDesc("When enabled, sets the color property in the frontmatter of the note when its color is changed.")
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.set_color_in_frontmatter)
+					.onChange(async (value) => {
+						this.plugin.settings.set_color_in_frontmatter = value;
+						await this.plugin.saveSettings();
+					});
+			});
 	}
 }

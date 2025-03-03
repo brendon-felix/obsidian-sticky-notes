@@ -95,9 +95,9 @@
 
   const trashIcon = (element: HTMLElement) => setIcon(element, "trash");
 
-  const changeColor = (newColor: string) => {
+  const changeColor = async (newColor: string) => {
     selectedColor = newColor;
-    saveColor(file.path, newColor); // Save the selected color
+    await saveColor(file.path, newColor); // Save the selected color
     updateLayoutNextTick(); // Ensure the layout is updated after changing the color
   };
 

@@ -2,9 +2,11 @@ import {
     type App,
     ItemView,
     TFile,
-    parseYaml, // Import parseYaml function
+    parseYaml,
+    stringifyYaml,
 } from "obsidian";
 import { derived, get, writable } from "svelte/store";
+import { type StickyNotesSettings } from "./main";
 
 export enum Sort {
     Created = "ctime",
@@ -29,9 +31,33 @@ export const loadColorMap = () => {
     }
 };
 
-export const saveColor = (filePath: string, color: string) => {
-    colorMap[filePath] = color;
-    saveColorMap();
+export const settings = writable<StickyNotesSettings>();
+
+export const saveColor = async (filePath: string, color: string) => {
+    const currentSettings = get(settings);
+    if (currentSettings.set_color_in_frontmatter) {
+        // const file = get(app).vault.getAbstractFileByPath(filePath) as TFile;
+        // if (file) {
+        //     const content = await file.vault.read(file);
+        //     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+        //     let newContent;
+        //     if (frontmatterMatch) {
+        //         const frontmatter = parseYaml(frontmatterMatch[1]);
+        //         frontmatter.color = color;
+        //         newContent = content.replace(
+        //             /^---\n[\s\S]*?\n---/,
+        //             `---\n${stringifyYaml(frontmatter)}---`
+        //         );
+        //     } else {
+        //         newContent = `---\ncolor: ${color}\n---\n${content}`;
+        //     }
+        //     await file.vault.modify(file, newContent);
+        // }
+		console.log("Setting color in frontmatter is not implemented yet.");
+    } else {
+		colorMap[filePath] = color;
+		saveColorMap();
+	}
 };
 
 export const loadColor = (filePath: string): string | undefined => {
@@ -93,4 +119,5 @@ export default {
     saveColorMap,
     loadColorMap,
     extractColorFromFrontmatter,
+    settings,
 };
