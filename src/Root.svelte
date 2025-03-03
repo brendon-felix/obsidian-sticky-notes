@@ -3,7 +3,7 @@
   import MiniMasonry from "minimasonry";
 
   import Card from "./Card.svelte";
-  import { displayedFiles } from "./store";
+  import { displayedFiles, loadColor } from "./store"; // Import loadColor function
 
   let grid: MiniMasonry;
   let cardsContainer: HTMLElement;  
@@ -27,8 +27,6 @@
   let lastLayout: Date = new Date();
   let pendingLayout: NodeJS.Timeout | null = null;
   export const debouncedLayout = () => {
-    // If there has been a relayout call in the last 100ms,
-    // we schedule another one 100ms later to avoid layout thrashing
     return new Promise<void>((resolve) => {
       if (
         lastLayout.getTime() + 100 > new Date().getTime() &&
@@ -46,13 +44,10 @@
         return;
       }
 
-      // Otherwise, relayout immediately
       grid.layout();
       lastLayout = new Date();
       resolve();
     });
-
-    
   };
   export const updateLayoutNextTick = async () => {
     await tick();
@@ -64,15 +59,9 @@
 
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path + file.stat.mtime)}
-    <Card {file} {updateLayoutNextTick} />
+    <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} />
   {/each}
 </div>
-
-<!-- <div class="cards-container" bind:this={cardsContainer}>
-  {#each $displayedFiles as file (file.path + file.stat.mtime)}
-    <Card {file} {updateLayoutNextTick} />
-  {/each}
-</div> -->
 
 <style>
   .cards-container {

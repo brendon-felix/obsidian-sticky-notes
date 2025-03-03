@@ -1,11 +1,10 @@
-
 import {
     type App,
     ItemView,
     TFile,
 } from "obsidian";
 import { derived, get, writable } from "svelte/store";
-  
+
 export enum Sort {
     Created = "ctime",
     Modified = "mtime",
@@ -13,17 +12,37 @@ export enum Sort {
 
 export const app = writable<App>();
 export const view = writable<ItemView>();
-// export const appCache = writable<MetadataCache>();
 export const files = writable<TFile[]>([]);
 export const sort = writable<Sort>(Sort.Modified);
+
+export const colorMap: Record<string, string> = {};
+
+export const saveColorMap = () => {
+    localStorage.setItem('stickyNotesColorMap', JSON.stringify(colorMap));
+};
+
+export const loadColorMap = () => {
+    const savedColorMap = localStorage.getItem('stickyNotesColorMap');
+    if (savedColorMap) {
+        Object.assign(colorMap, JSON.parse(savedColorMap));
+    }
+};
+
+export const saveColor = (filePath: string, color: string) => {
+    colorMap[filePath] = color;
+    saveColorMap();
+	console.log(colorMap);
+};
+
+export const loadColor = (filePath: string): string | undefined => {
+    return colorMap[filePath];
+};
 
 const sortedFiles = derived(
     [sort, files],
     ([$sort, $files]) =>
       [...$files].sort(
         (a: TFile, b: TFile) =>
-        //   ($pinnedFiles.includes(b.path) ? 1 : 0) -
-        // 	($pinnedFiles.includes(a.path) ? 1 : 0) ||
           b.stat[$sort] - a.stat[$sort],
       ),
     [] as TFile[],
@@ -34,14 +53,12 @@ export const displayedFiles = writable<TFile[]>([]);
 
 displayedFiles.set(
     get(sortedFiles)
-    //   .filter((f) => !get(searchResultsExcluded).has(f))
       .slice(0, get(displayedFiles).length),
 );
 
 sortedFiles.subscribe(($sortedFiles) => {
     displayedFiles.set(
       $sortedFiles
-        // .filter((f) => !get(searchResultsExcluded).has(f))
         .slice(0, get(displayedFiles).length),
     );
 });
@@ -49,11 +66,9 @@ sortedFiles.subscribe(($sortedFiles) => {
 displayedCount.subscribe((count) => {
     displayedFiles.set(
       get(sortedFiles)
-        // .filter((f) => !get(searchResultsExcluded).has(f))
         .slice(0, count),
     );
 });
-
 
 export default {
     files,
@@ -62,4 +77,9 @@ export default {
     displayedFiles,
     app,
     view,
+    saveColor,
+    loadColor,
+	colorMap,
+    saveColorMap,
+    loadColorMap,
 };

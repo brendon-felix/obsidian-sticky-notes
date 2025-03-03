@@ -8,9 +8,8 @@
   } from "obsidian";
   import { onMount } from "svelte";
   import { blur } from "svelte/transition";
-  import { app, view } from "./store";
+  import { app, view, saveColor } from "./store"; // Import saveColor function
   import { assert, is } from "tsafe";
-
 
   interface Props {
     file: TFile;
@@ -22,6 +21,9 @@
 
   let contentDiv: HTMLElement;
   let translateTransition: boolean = $state(false);
+  let selectedColor: string = $state(color || "#FFD700");
+
+  const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
   function postProcessor(
     element: HTMLElement,
@@ -85,10 +87,19 @@
     await updateLayoutNextTick();
   };
 
-  const openFile = async () =>
-    await $app.workspace.getLeaf("tab").openFile(file);
+  // const openFile = async () =>
+  //   await $app.workspace.getLeaf("tab").openFile(file);
+
+  const openFile = async () => {}
+    // await $app.workspace.getLeaf("tab").openFile(file);
 
   const trashIcon = (element: HTMLElement) => setIcon(element, "trash");
+
+  const changeColor = (newColor: string) => {
+    selectedColor = newColor;
+    saveColor(file.path, newColor); // Save the selected color
+    updateLayoutNextTick(); // Ensure the layout is updated after changing the color
+  };
 
   onMount(() => {
     (async () => {
@@ -109,7 +120,7 @@
   role="link"
   onkeydown={openFile}
   tabindex="0"
-  style="border-color: {color || "#FFD700"};"
+  style="border-color: {selectedColor};"
 >
   <div bind:this={contentDiv}></div>
   <div class="card-menu">
@@ -119,6 +130,17 @@
       onclick={trashFile}
       aria-label="Delete file"
     ></button>
+    <div class="color-picker">
+      {#each colors as colorOption}
+        <button
+          class="color-option"
+          style="background-color: {colorOption};"
+          onclick={() => changeColor(colorOption)}
+          onkeydown={(e) => e.key === 'Enter' && changeColor(colorOption)}
+          aria-label="Change color to {colorOption}"
+        ></button>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -256,5 +278,18 @@
   .card:hover .delete-button {
     display: block;
   } */
+
+  .color-picker {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+  }
+
+  .color-option {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
 
 </style>

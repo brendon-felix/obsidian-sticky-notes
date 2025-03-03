@@ -41,6 +41,7 @@ export class StickyNotesView extends ItemView {
 	}
 
 	async onOpen() {
+		console.log(store.colorMap);
         const viewContent = this.containerEl.children[1];
         store.view.set(this);
         let md_files = this.app.vault.getMarkdownFiles();

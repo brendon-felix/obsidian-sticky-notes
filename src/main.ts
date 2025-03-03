@@ -1,4 +1,3 @@
-
 // TODO: Create a new note button
 // TODO: Add notification on deletion and undo option
 //   TODO: Add support for Ctrl+Z and Ctrl+Y
@@ -23,7 +22,7 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import { StickyNotesView, VIEW_TYPE } from "./view";
-import store from "./store";
+import store, { loadColorMap } from "./store";
 
 import { FolderSuggest } from "./FolderSuggestor";
 
@@ -41,6 +40,7 @@ export default class StickyNotesPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		store.app.set(this.app);
+		loadColorMap(); // Load the colorMap when the plugin is loaded
 
 		this.registerView(
 			VIEW_TYPE,
