@@ -85,10 +85,10 @@ export default class StickyNotesPlugin extends Plugin {
 	async create_new_sticky_note() {
 		const root = this.app.vault.getRoot().path;
 		// const timestamp = new Date().toLocaleString().replace(/[/\\:]/g, '-');
-		const timestamp = Date.now();
+		const timestamp = Math.floor(Date.now() / 1000); // Unix time in seconds
 		const filename = `${timestamp}`;
 		const path = `${root}Sticky Notes/${filename}.md`;
-		console.log(`${path}`);
+		// console.log(`${path}`);
 		const created_note = await this.app.vault.create(path, "");
 		const active_leaf = this.app.workspace.getLeaf(false);
 		await active_leaf.openFile(created_note, {

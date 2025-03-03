@@ -41,7 +41,6 @@ export class StickyNotesView extends ItemView {
 	}
 
 	async onOpen() {
-		console.log(store.colorMap);
         const viewContent = this.containerEl.children[1];
         store.view.set(this);
         let md_files = this.app.vault.getMarkdownFiles();
@@ -94,7 +93,6 @@ export class StickyNotesView extends ItemView {
 			),
 		);
         store.displayedCount.set(NUM_LOAD);
-        // console.log(get(store.displayedFiles));
         this.root = mount(Root, {target: viewContent});
 		this.lastWidth = this.containerEl.clientWidth;
 		this.lastHeight = this.containerEl.clientHeight;
