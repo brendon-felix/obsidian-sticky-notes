@@ -2,6 +2,7 @@ import {
     type App,
     ItemView,
     TFile,
+    parseYaml, // Import parseYaml function
 } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 
@@ -36,6 +37,16 @@ export const saveColor = (filePath: string, color: string) => {
 
 export const loadColor = (filePath: string): string | undefined => {
     return colorMap[filePath];
+};
+
+export const extractColorFromFrontmatter = async (file: TFile): Promise<string | undefined> => {
+    const content = await file.vault.cachedRead(file);
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (frontmatterMatch) {
+        const frontmatter = parseYaml(frontmatterMatch[1]);
+        return frontmatter.color;
+    }
+    return undefined;
 };
 
 const sortedFiles = derived(
@@ -82,4 +93,5 @@ export default {
 	colorMap,
     saveColorMap,
     loadColorMap,
+    extractColorFromFrontmatter,
 };

@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf, TAbstractFile, TFile } from "obsidian";
 import Root from './Root.svelte';
 import { mount, unmount } from 'svelte';
 import { derived, get, writable } from "svelte/store";
-import store, { Sort } from "./store";
+import store, { Sort, extractColorFromFrontmatter } from "./store";
 import StickyNotesPlugin from "./main";
 
 export const VIEW_TYPE = 'sticky-notes-view';
@@ -47,7 +47,12 @@ export class StickyNotesView extends ItemView {
         let md_files = this.app.vault.getMarkdownFiles();
 		const folderPath = this.plugin.settings.sticky_notes_folder;
 		md_files = md_files.filter(file => file.path.startsWith(folderPath));
-        // console.log(md_files);
+		for (const file of md_files) {
+			const color = await extractColorFromFrontmatter(file);
+			if (color) {
+				store.saveColor(file.path, color);
+			}
+		}
         store.files.set(md_files);
 		this.registerEvent(
 			this.app.vault.on("create", async (file: TAbstractFile) => {
@@ -102,14 +107,10 @@ export class StickyNotesView extends ItemView {
 				store.displayedCount.set(get(store.displayedFiles).length + NUM_LOAD);
 			}
 		});
-		// this.root?.updateLayoutNextTick();
 	}
 
 	async onClose() {
 		store.displayedCount.set(NUM_LOAD);
-        // if (this.counter) {
-        //     unmount(this.counter);
-        // }
 		if (this.root) {
 			unmount(this.root);
 		}

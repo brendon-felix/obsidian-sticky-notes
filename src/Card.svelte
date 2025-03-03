@@ -8,7 +8,7 @@
   } from "obsidian";
   import { onMount } from "svelte";
   import { blur } from "svelte/transition";
-  import { app, view, saveColor } from "./store"; // Import saveColor function
+  import { app, view, saveColor, extractColorFromFrontmatter } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
   import { assert, is } from "tsafe";
 
   interface Props {
@@ -101,13 +101,14 @@
     updateLayoutNextTick(); // Ensure the layout is updated after changing the color
   };
 
-  onMount(() => {
-    (async () => {
-      await renderFile(contentDiv);
-      await updateLayoutNextTick();
-      translateTransition = true;
-    })();
-    return () => updateLayoutNextTick();
+  onMount(async () => {
+    const frontmatterColor = await extractColorFromFrontmatter(file);
+    if (frontmatterColor) {
+      selectedColor = frontmatterColor;
+    }
+    await renderFile(contentDiv);
+    await updateLayoutNextTick();
+    translateTransition = true;
   });
 
 </script>
