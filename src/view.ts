@@ -6,14 +6,18 @@ import store, { Sort } from "./store";
 import StickyNotesPlugin from "./main";
 
 export const VIEW_TYPE = 'sticky-notes-view';
+export const NUM_LOAD = 20;
 
 export class StickyNotesView extends ItemView {
     root: ReturnType<typeof Root> | undefined;
 	plugin: StickyNotesPlugin;
+	lastWidth: number;
+	lastHeight: number;
 
 	constructor(leaf: WorkspaceLeaf, plugin: StickyNotesPlugin) {
 		super(leaf);
 		this.plugin = plugin;
+		this.navigation = false;
 	}
 
 	getViewType() {
@@ -25,7 +29,15 @@ export class StickyNotesView extends ItemView {
 	}
 
 	onResize() {
-		this.root?.updateLayoutNextTick();
+		const { clientWidth, clientHeight } = this.containerEl;
+		if (
+			(clientWidth !== 0 && clientHeight !== 0) &&
+			(this.lastWidth !== clientWidth || this.lastHeight !== clientHeight)
+		) {
+			this.lastWidth = clientWidth;
+			this.lastHeight = clientHeight;
+			this.root?.updateLayoutNextTick();
+		}
 	}
 
 	async onOpen() {
@@ -38,62 +50,67 @@ export class StickyNotesView extends ItemView {
         store.files.set(md_files);
 		this.registerEvent(
 			this.app.vault.on("create", async (file: TAbstractFile) => {
-			  if (!this.app.workspace.layoutReady) {
-				return;
-			  }
-			  if (file instanceof TFile && file.extension === "md") {
-				store.files.update((files) => files?.concat(file));
-			  }
-			}),
-		  );
-		  this.registerEvent(
-			this.app.vault.on("delete", async (file: TAbstractFile) => {
-			  if (file instanceof TFile && file.extension === "md") {
-				store.files.update((files) =>
-				  files?.filter((f) => f.path !== file.path),
-				);
-			  }
-			}),
-		  );
-		  this.registerEvent(
-			this.app.vault.on("modify", async (file: TAbstractFile) => {
-			  if (file instanceof TFile && file.extension === "md") {
-				store.files.update((files) =>
-				  files?.map((f) => (f.path === file.path ? file : f)),
-				);
-			  }
-			}),
-		  );
-		  this.registerEvent(
-			this.app.vault.on(
-			  "rename",
-			  async (file: TAbstractFile, oldPath: string) => {
-				if (file instanceof TFile && file.extension === "md") {
-				  store.files.update((files) =>
-					files?.map((f) => (f.path === oldPath ? file : f)),
-				  );
+				if (!this.app.workspace.layoutReady) {
+					return;
 				}
-			  },
+				if (file instanceof TFile && file.extension === "md") {
+					store.files.update((files) => files?.concat(file));
+				}
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on("delete", async (file: TAbstractFile) => {
+				if (file instanceof TFile && file.extension === "md") {
+					store.files.update((files) =>
+						files?.filter((f) => f.path !== file.path),
+					);
+				}
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on("modify", async (file: TAbstractFile) => {
+				if (file instanceof TFile && file.extension === "md") {
+					store.files.update((files) =>
+						files?.map((f) => (f.path === file.path ? file : f)),
+					);
+				}
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on("rename",
+				async (file: TAbstractFile, oldPath: string) => {
+					if (file instanceof TFile && file.extension === "md") {
+						store.files.update((files) =>
+							files?.map((f) => (f.path === oldPath ? file : f)),
+						);
+					}
+				},
 			),
-		  );
-        // store.displayedCount.set(50);
-        console.log(get(store.displayedFiles));
+		);
+        store.displayedCount.set(NUM_LOAD);
+        // console.log(get(store.displayedFiles));
         this.root = mount(Root, {target: viewContent});
+		this.lastWidth = this.containerEl.clientWidth;
+		this.lastHeight = this.containerEl.clientHeight;
 
 		viewContent.addEventListener("scroll", async () => {
 			if (
-			  viewContent.scrollTop + viewContent.clientHeight >
-			  viewContent.scrollHeight - 500
+				viewContent.scrollTop + viewContent.clientHeight >
+				viewContent.scrollHeight - 500
 			) {
-			  store.displayedCount.set(get(store.displayedFiles).length + 25);
+				store.displayedCount.set(get(store.displayedFiles).length + NUM_LOAD);
 			}
-		  });
+		});
+		// this.root?.updateLayoutNextTick();
 	}
 
 	async onClose() {
-		store.displayedCount.set(25);
+		store.displayedCount.set(NUM_LOAD);
         // if (this.counter) {
         //     unmount(this.counter);
         // }
+		if (this.root) {
+			unmount(this.root);
+		}
 	}
 }

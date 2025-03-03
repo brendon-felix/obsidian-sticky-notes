@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Menu, setIcon } from "obsidian";
   import { onMount, tick } from "svelte";
   import MiniMasonry from "minimasonry";
 
@@ -61,13 +60,11 @@
   };
   displayedFiles.subscribe(updateLayoutNextTick);
 
-  const defaultColor = "#FFD700";
-
 </script>
 
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path + file.stat.mtime)}
-    <Card {file} {updateLayoutNextTick} {defaultColor} />
+    <Card {file} {updateLayoutNextTick} />
   {/each}
 </div>
 

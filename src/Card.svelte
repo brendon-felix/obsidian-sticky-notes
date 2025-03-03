@@ -7,7 +7,7 @@
     TFile,
   } from "obsidian";
   import { onMount } from "svelte";
-  import { fly } from "svelte/transition";
+  import { blur } from "svelte/transition";
   import { app, view } from "./store";
   import { assert, is } from "tsafe";
 
@@ -16,10 +16,9 @@
     file: TFile;
     updateLayoutNextTick: () => Promise<void>;
     color?: string;
-    defaultColor: string;
   }
 
-  let { file, updateLayoutNextTick, color, defaultColor }: Props = $props();
+  let { file, updateLayoutNextTick, color }: Props = $props();
 
   let contentDiv: HTMLElement;
   let translateTransition: boolean = $state(false);
@@ -105,12 +104,12 @@
 <div
   class="card"
   class:transition={translateTransition}
-  transition:fly
+  transition:blur
   onclick={openFile}
   role="link"
   onkeydown={openFile}
   tabindex="0"
-  style="border-color: {color || defaultColor};"
+  style="border-color: {color || "#FFD700"};"
 >
   <div bind:this={contentDiv}></div>
   <div class="card-menu">
@@ -135,7 +134,7 @@
     width: 300px;
     height: 250px;
   }
-
+  
   .card.transition {
     transition-property: transform;
     transition-duration: 0.2s;

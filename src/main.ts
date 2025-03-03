@@ -1,19 +1,27 @@
 
+// TODO: Create a new note button
+// TODO: Add notification on deletion and undo option
+//   TODO: Add support for Ctrl+Z and Ctrl+Y
 // TODO: Store state of note order, color, etc.
 // TODO: Figure out a better format for automatic titles
 //   TODO: Add setting to configure automatic title format
 // TODO: Create menu for selecting note color
 // TODO: Improve layout, possibly use a single column
-// TODO: Fix border highlight on hover
-// TODO: Create a new note button
 // TODO: Add a search bar
 // TODO: Implement in-card editing
 // TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to reorder notes
 // TODO: Add drag and drop functionality to trash notes
 
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, ItemView, WorkspaceLeaf, TFile } from 'obsidian';
-import { derived, get, writable } from "svelte/store";
+// FIX: Border highlight on hover
+
+import {
+	App,
+	Plugin,
+	PluginSettingTab,
+	Setting,
+	WorkspaceLeaf,
+} from 'obsidian';
 import { StickyNotesView, VIEW_TYPE } from "./view";
 import store from "./store";
 
@@ -23,7 +31,7 @@ interface StickyNotesSettings {
 	sticky_notes_folder: string;
 }
 
-const DEFAULT_SETTINGS: StickyNotesSettings = {
+export const DEFAULT_SETTINGS: StickyNotesSettings = {
 	sticky_notes_folder: "",
 }
 
@@ -59,16 +67,8 @@ export default class StickyNotesPlugin extends Plugin {
 			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new StickyNotesSettingsTab(this.app, this));
 
-		// // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// // Using this function will automatically remove the event listener when this plugin is disabled.
-		// this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-		// 	console.log('click', evt);
-		// });
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
@@ -99,10 +99,11 @@ export default class StickyNotesPlugin extends Plugin {
 		if (leaves.length > 0) {
 			leaf = leaves[0];
 		} else {
-			leaf = workspace.getLeaf(false);
-			await leaf.setViewState({ type: VIEW_TYPE, active: true });
+			// leaf = workspace.getLeaf(false);
+			leaf = workspace.getLeaf("tab");
 		}
-		workspace.revealLeaf(leaf);
+		await leaf.setViewState({ type: VIEW_TYPE, active: true });
+		// workspace.revealLeaf(leaf);
 	}
 
 	async loadSettings() {
