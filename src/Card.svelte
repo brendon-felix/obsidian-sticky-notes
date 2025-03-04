@@ -27,6 +27,8 @@
 
   const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
+  let isHoveringTop: boolean = $state(false);
+
   function postProcessor(
     element: HTMLElement,
     context: MarkdownPostProcessorContext,
@@ -46,33 +48,13 @@
       charCount += element.children[lastBlockIndex]?.textContent?.length || 0;
     } while (
       lastBlockIndex < element.children.length &&
-      charCount < 200 &&
+      charCount < 300 &&
       ++lastBlockIndex
     );
 
     // Remove all blocks after the last block
     for (let i = element.children.length - 1; i > lastBlockIndex; i--) {
       element.children[i]?.remove();
-    }
-
-    if (charCount < 200) {
-      return;
-    }
-    // Cut the last block
-    if (
-      !element.children[lastBlockIndex].lastChild ||
-      element.children[lastBlockIndex].lastChild?.nodeType !== Node.TEXT_NODE
-    ) {
-      return;
-    }
-
-    const lastElText = element.children[lastBlockIndex].lastChild?.textContent;
-    if (lastElText != null) {
-      const lastChild = element.children[lastBlockIndex].lastChild;
-      assert(!is<null>(lastChild));
-      assert(!is<null>(lastElText));
-      const cut = Math.min(50, 200 - (charCount - lastElText.length));
-      lastChild.textContent = `${lastElText.slice(0, cut)} ...`;
     }
   }
 
@@ -113,8 +95,22 @@
     }
   };
 
-  const handleCardClick = () => {
+  const handleCardClick = (event: MouseEvent) => {
+    if ((event.target as HTMLElement).closest('.card-menu') || isEditing) {
+      return;
+    }
     isEditing = true;
+    tick().then(() => {
+      const textarea = document.querySelector('textarea');
+      if (textarea) {
+        const scrollTop = textarea.scrollTop;
+        textarea.focus();
+        const frontmatterEnd = editorContent.indexOf('---', 3) + 4; // Find the end of frontmatter
+        const startPosition = frontmatterEnd > 3 ? frontmatterEnd : 0; // If frontmatter exists, skip it
+        textarea.setSelectionRange(startPosition, startPosition); // Place cursor at the beginning of the note text
+        textarea.scrollTop = scrollTop; // Restore the scroll position
+      }
+    });
   };
 
   const handleCardKeyPress = () => {
@@ -125,6 +121,15 @@
     if (event.key === "Escape" && isEditing) {
       closeEditor();
     }
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    isHoveringTop = event.clientY - rect.top < 30;
+  };
+
+  const handleMouseLeave = () => {
+    isHoveringTop = false;
   };
 
   onMount(async () => {
@@ -155,19 +160,15 @@
   onkeydown={handleCardKeyPress}
   tabindex="0"
   style="border-color: {selectedColor};"
+  onmousemove={handleMouseMove}
+  onmouseleave={handleMouseLeave}
 >
   {#if isEditing}
-    <textarea bind:value={editorContent} onblur={closeEditor}></textarea>
+    <textarea bind:value={editorContent} onfocusout={closeEditor}></textarea>
   {:else}
     <div class="read-view" bind:this={contentDiv}></div>
   {/if}
-  <div class="card-menu">
-    <button
-      class="clickable-icon"
-      use:trashIcon
-      onclick={trashFile}
-      aria-label="Delete file"
-    ></button>
+  <div class="card-menu" class:visible={isHoveringTop && !isEditing}>
     <div class="color-picker">
       {#each colors as colorOption}
         <button
@@ -179,6 +180,12 @@
         ></button>
       {/each}
     </div>
+    <button
+      class="clickable-icon"
+      use:trashIcon
+      onclick={trashFile}
+      aria-label="Delete file"
+    ></button>
   </div>
 </div>
 
@@ -188,7 +195,6 @@
     background-color: var(--background-primary-alt);
     border: 1px solid var(--background-modifier-border);
     border-top-width: 5px;
-    /* padding: var(--card-padding); */
     padding: 0;
     word-wrap: break-word;
     overflow-y: hidden;
@@ -230,8 +236,10 @@
   }
 
   .card :global(span.image-embed) {
-    margin: 0 calc(-1 * var(--card-padding));
-    width: calc(100% + 2 * var(--card-padding));
+    /* margin: 0 calc(-1 * var(--card-padding)); */
+    margin: var(--card-padding) 0;
+    /* width: calc(100% + 2 * var(--card-padding)); */
+    width: 100%;
   }
 
   /* Images embeds alone in a paragraph */
@@ -262,77 +270,53 @@
     left: 0;
     right: 0;
     bottom: 0;
-    box-shadow: inset 0 -2rem 1rem -1rem var(--background-primary-alt);
+    /* box-shadow: inset 0 -2rem 1rem -1rem var(--background-primary-alt); */
   }
 
   .card:hover {
-    /* background-color: var(--background-modifier-hover); */
     border-color: var(--border-color-hover);
+  }
+
+  .card:hover .card-menu {
+    display: flex;
   }
 
   .card :global(h3) {
     word-wrap: break-word;
   }
 
-  /* .card .card-menu {
-    margin: calc(-1 * var(--card-padding));
-    margin-top: 0;
-    border-top: 1px solid var(--background-modifier-border);
-    padding: var(--size-4-1) var(--card-padding);
-    background-color: var(--background-primary);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--size-4-1);
-  } */
-
   .card .card-menu {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    /* width: 20px; */
-    /* height: 20px; */
-    /* background-color: red; */
-    display: none;
-    /* cursor: pointer; */
+    top: -30px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background-color: var(--background-primary);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    transition: top 0.2s ease-in-out;
   }
 
-
-  .card:hover .card-menu {
-    display: block;
+  .card .card-menu.visible {
+    top: 0;
   }
-
-  /* .card .card-menu .clickable-icon {
-    color: var(--tab-text-color-focused-active);
-    background-color: var(--background-modifier-hover);
-  } */
-
-  /* .delete-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 20px;
-    height: 20px;
-    background-color: red;
-    display: none;
-    cursor: pointer;
-  }
-
-  .card:hover .delete-button {
-    display: block;
-  } */
 
   .color-picker {
     display: flex;
     gap: 2px;
-    margin-top: 5px;
+    margin-right: 10px;
   }
 
   .color-option {
     width: 20px;
     height: 20px;
-    /* border-radius: 50%; */
+    cursor: pointer;
+  }
+
+  .clickable-icon {
     cursor: pointer;
   }
 
