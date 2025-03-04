@@ -1,3 +1,8 @@
+// TODO: Implement in-card editing
+//   TODO: Make notes editable on single click
+// TODO: Add setting to configure default note color
+// TODO: Add reset button to reset note color to default
+// TODO: Add setting for naming pattern (currently Unix timestamp)
 // TODO: Create a new note button
 // TODO: Add notification on deletion and undo option
 //   TODO: Add support for Ctrl+Z and Ctrl+Y
@@ -6,8 +11,7 @@
 //   TODO: Add setting to configure automatic title format
 // TODO: Create menu for selecting note color
 // TODO: Improve layout, possibly use a single column
-// TODO: Add a search bar
-// TODO: Implement in-card editing
+// TODO: Add a search bar=
 // TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to reorder notes
 // TODO: Add drag and drop functionality to trash notes
