@@ -123,6 +123,20 @@
     }
   };
 
+  const handleTextareaKeydown = async (event: KeyboardEvent) => {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      const textarea = event.target as HTMLTextAreaElement;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.value = textarea.value.substring(0, start) + "\t" + textarea.value.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+      editorContent = textarea.value; // Update editorContent with the new value
+    } else if (event.key === "Escape" && isEditing) {
+      await closeEditor(); // Ensure modifications are saved when Escape is pressed
+    }
+  };
+
   const handleMouseMove = (event: MouseEvent) => {
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     isHoveringTop = event.clientY - rect.top < 30;
@@ -164,7 +178,7 @@
   onmouseleave={handleMouseLeave}
 >
   {#if isEditing}
-    <textarea bind:value={editorContent} onfocusout={closeEditor}></textarea>
+    <textarea bind:value={editorContent} onfocusout={closeEditor} onkeydown={handleTextareaKeydown}></textarea>
   {:else}
     <div class="read-view" bind:this={contentDiv}></div>
   {/if}
@@ -329,6 +343,26 @@
     font-size: 0.9rem;
     background-color: var(--background-primary-alt);
     color: var(--text-normal);
+  }
+
+  .card :global(pre) {
+    white-space: pre-wrap; /* Wrap code blocks to fit within the card */
+    word-wrap: break-word; /* Break long words to fit within the card */
+  }
+
+  .card :global(code) {
+    white-space: pre-wrap; /* Wrap inline code to fit within the card */
+    word-wrap: break-word; /* Break long words to fit within the card */
+  }
+
+  .card :global(ul),
+  .card :global(ol) {
+    padding-left: 1rem; /* Reduce indentation for lists */
+  }
+
+  .card :global(ul ul),
+  .card :global(ol ol) {
+    padding-left: 1rem; /* Reduce indentation for nested lists */
   }
 
 </style>
