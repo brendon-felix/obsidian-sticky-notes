@@ -6,7 +6,7 @@
     setIcon,
     TFile,
   } from "obsidian";
-  import { onMount } from "svelte";
+  import { onMount, tick, onDestroy } from "svelte"; // Import onDestroy from svelte
   import { blur } from "svelte/transition";
   import { app, view, saveColor, extractColorFromFrontmatter } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
   import { assert, is } from "tsafe";
@@ -19,9 +19,11 @@
 
   let { file, updateLayoutNextTick, color }: Props = $props();
 
-  let contentDiv: HTMLElement;
+  let contentDiv: HTMLElement | null = $state(null);
   let translateTransition: boolean = $state(false);
   let selectedColor: string = $state(color || "#FFD700");
+  let isEditing: boolean = $state(false);
+  let editorContent: string = $state("");
 
   const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
@@ -76,6 +78,7 @@
 
   const renderFile = async (el: HTMLElement): Promise<void> => {
     const content = await file.vault.cachedRead(file);
+    editorContent = content;
     MarkdownPreviewRenderer.registerPostProcessor(postProcessor);
     await MarkdownRenderer.render($app, content, el, file.path, $view);
     MarkdownPreviewRenderer.unregisterPostProcessor(postProcessor);
@@ -90,9 +93,6 @@
   // const openFile = async () =>
   //   await $app.workspace.getLeaf("tab").openFile(file);
 
-  const openFile = async () =>
-    await $app.workspace.getLeaf("tab").openFile(file);
-
   const trashIcon = (element: HTMLElement) => setIcon(element, "trash");
 
   const changeColor = async (newColor: string) => {
@@ -101,14 +101,47 @@
     updateLayoutNextTick(); // Ensure the layout is updated after changing the color
   };
 
+  const closeEditor = async () => {
+    if (editorContent !== await file.vault.cachedRead(file)) {
+      await file.vault.modify(file, editorContent);
+      await updateLayoutNextTick();
+    }
+    isEditing = false;
+    await tick(); // Wait for the DOM to update
+    if (contentDiv !== null) {
+      await renderFile(contentDiv);
+    }
+  };
+
+  const handleCardClick = () => {
+    isEditing = true;
+  };
+
+  const handleCardKeyPress = () => {
+    // isEditing = true;
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && isEditing) {
+      closeEditor();
+    }
+  };
+
   onMount(async () => {
     const frontmatterColor = await extractColorFromFrontmatter(file);
     if (frontmatterColor) {
       selectedColor = frontmatterColor;
     }
-    await renderFile(contentDiv);
+    if (contentDiv !== null) {
+      await renderFile(contentDiv);
+    }
     await updateLayoutNextTick();
     translateTransition = true;
+    document.addEventListener("keydown", handleKeyDown); // Add event listener
+  });
+
+  onDestroy(() => {
+    document.removeEventListener("keydown", handleKeyDown); // Remove event listener
   });
 
 </script>
@@ -117,13 +150,17 @@
   class="card"
   class:transition={translateTransition}
   transition:blur
-  ondblclick={openFile}
+  onclick={handleCardClick}
   role="link"
-  onkeydown={openFile}
+  onkeydown={handleCardKeyPress}
   tabindex="0"
   style="border-color: {selectedColor};"
 >
-  <div bind:this={contentDiv}></div>
+  {#if isEditing}
+    <textarea bind:value={editorContent} onblur={closeEditor}></textarea>
+  {:else}
+    <div class="read-view" bind:this={contentDiv}></div>
+  {/if}
   <div class="card-menu">
     <button
       class="clickable-icon"
@@ -151,7 +188,8 @@
     background-color: var(--background-primary-alt);
     border: 1px solid var(--background-modifier-border);
     border-top-width: 5px;
-    padding: var(--card-padding);
+    /* padding: var(--card-padding); */
+    padding: 0;
     word-wrap: break-word;
     overflow-y: hidden;
     margin: 0;
@@ -165,7 +203,11 @@
   }
 
   .card {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .read-view {
+    padding: var(--card-padding);
   }
 
   .card :global(p),
@@ -283,15 +325,26 @@
 
   .color-picker {
     display: flex;
-    gap: 5px;
+    gap: 2px;
     margin-top: 5px;
   }
 
   .color-option {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
+    /* border-radius: 50%; */
     cursor: pointer;
+  }
+
+  textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    resize: none;
+    padding: var(--card-padding);
+    font-size: 0.9rem;
+    background-color: var(--background-primary-alt);
+    color: var(--text-normal);
   }
 
 </style>
