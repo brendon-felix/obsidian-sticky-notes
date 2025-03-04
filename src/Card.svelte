@@ -105,10 +105,10 @@
       if (textarea) {
         const scrollTop = textarea.scrollTop;
         textarea.focus();
-        const frontmatterEnd = editorContent.indexOf('---', 3) + 4; // Find the end of frontmatter
-        const startPosition = frontmatterEnd > 3 ? frontmatterEnd : 0; // If frontmatter exists, skip it
-        textarea.setSelectionRange(startPosition, startPosition); // Place cursor at the beginning of the note text
-        textarea.scrollTop = scrollTop; // Restore the scroll position
+        const frontmatterEnd = editorContent.indexOf('---', 3) + 4;
+        const startPosition = frontmatterEnd > 3 ? frontmatterEnd : 0;
+        textarea.setSelectionRange(startPosition, startPosition);
+        textarea.scrollTop = scrollTop;
       }
     });
   };
@@ -131,9 +131,9 @@
       const end = textarea.selectionEnd;
       textarea.value = textarea.value.substring(0, start) + "\t" + textarea.value.substring(end);
       textarea.selectionStart = textarea.selectionEnd = start + 1;
-      editorContent = textarea.value; // Update editorContent with the new value
+      editorContent = textarea.value;
     } else if (event.key === "Escape" && isEditing) {
-      await closeEditor(); // Ensure modifications are saved when Escape is pressed
+      await closeEditor();
     }
   };
 
@@ -156,11 +156,11 @@
     }
     await updateLayoutNextTick();
     translateTransition = true;
-    document.addEventListener("keydown", handleKeyDown); // Add event listener
+    document.addEventListener("keydown", handleKeyDown);
   });
 
   onDestroy(() => {
-    document.removeEventListener("keydown", handleKeyDown); // Remove event listener
+    document.removeEventListener("keydown", handleKeyDown);
   });
 
 </script>
@@ -241,18 +241,16 @@
     margin: 0 0 0.3rem;
   }
 
-  .card :global(ul) {
+  /* .card :global(ul) {
     padding-left: var(--size-4-5);
-  }
+  } */
 
   .card :global(p:has(> span.image-embed):not(:has(br))) {
     margin: 0;
   }
 
   .card :global(span.image-embed) {
-    /* margin: 0 calc(-1 * var(--card-padding)); */
     margin: var(--card-padding) 0;
-    /* width: calc(100% + 2 * var(--card-padding)); */
     width: 100%;
   }
 
@@ -346,23 +344,23 @@
   }
 
   .card :global(pre) {
-    white-space: pre-wrap; /* Wrap code blocks to fit within the card */
-    word-wrap: break-word; /* Break long words to fit within the card */
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   .card :global(code) {
-    white-space: pre-wrap; /* Wrap inline code to fit within the card */
-    word-wrap: break-word; /* Break long words to fit within the card */
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   .card :global(ul),
   .card :global(ol) {
-    padding-left: 1rem; /* Reduce indentation for lists */
+    padding-left: 1rem;
   }
 
   .card :global(ul ul),
   .card :global(ol ol) {
-    padding-left: 1rem; /* Reduce indentation for nested lists */
+    padding-left: 1rem;
   }
 
 </style>
