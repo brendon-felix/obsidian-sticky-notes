@@ -4,6 +4,7 @@ import { mount, unmount } from 'svelte';
 import { derived, get, writable } from "svelte/store";
 import store, { Sort, extractColorFromFrontmatter } from "./store";
 import StickyNotesPlugin from "./main";
+import { onDragStart, onDragOver, onDrop } from './dragDropHandlers';
 
 export const VIEW_TYPE = 'sticky-notes-view';
 export const NUM_LOAD = 20;
@@ -93,7 +94,7 @@ export class StickyNotesView extends ItemView {
 			),
 		);
         store.displayedCount.set(NUM_LOAD);
-        this.root = mount(Root, {target: viewContent});
+        this.root = mount(Root, { target: viewContent, props: { onDragStart, onDragOver, onDrop } }); // Pass handlers as props
 		this.lastWidth = this.containerEl.clientWidth;
 		this.lastHeight = this.containerEl.clientHeight;
 

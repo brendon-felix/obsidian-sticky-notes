@@ -55,11 +55,16 @@
   };
   displayedFiles.subscribe(updateLayoutNextTick);
 
+  export let onDragStart;
+  export let onDragOver;
+  export let onDrop;
+  
+
 </script>
 
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path + file.stat.mtime)}
-    <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} />
+    <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} {onDragStart} {onDragOver} {onDrop} />
   {/each}
 </div>
 

@@ -74,34 +74,70 @@ export const extractColorFromFrontmatter = async (file: TFile): Promise<string |
     return undefined;
 };
 
+export const manualOrder = writable<string[]>([]); // Store manual order of notes
+
+export const saveManualOrder = () => {
+	localStorage.setItem('stickyNotesManualOrder', JSON.stringify(get(manualOrder)));
+};
+
+export const loadManualOrder = () => {
+	const savedOrder = localStorage.getItem('stickyNotesManualOrder');
+	if (savedOrder) {
+		manualOrder.set(JSON.parse(savedOrder));
+	}
+};
+
+// Load manual order when the store is initialized
+loadManualOrder();
+
 const sortedFiles = derived(
-    [sort, files],
-    ([$sort, $files]) =>
-      [...$files].sort(
-        (a: TFile, b: TFile) =>
-          b.stat[$sort] - a.stat[$sort],
-      ),
-    [] as TFile[],
+	[manualOrder, files],
+	([$manualOrder, $files]) => {
+		if ($manualOrder.length > 0) {
+			const orderedFiles = $manualOrder.map(path => $files.find(file => file.path === path)).filter(Boolean);
+			const unorderedFiles = $files.filter(file => !$manualOrder.includes(file.path));
+			return [...orderedFiles, ...unorderedFiles];
+		}
+		return $files;
+	},
+	[] as TFile[],
 );
+
+files.subscribe((fileList) => {
+	const currentOrder = get(manualOrder);
+	const newOrder = fileList.map(file => file.path);
+	if (currentOrder.length === 0) {
+		manualOrder.set(newOrder);
+		saveManualOrder();
+	} else {
+		const missingFiles = newOrder.filter(path => !currentOrder.includes(path));
+		if (missingFiles.length > 0) {
+			manualOrder.set([...currentOrder, ...missingFiles]);
+			saveManualOrder();
+		}
+	}
+});
 
 export const displayedCount = writable(0);
 export const displayedFiles = writable<TFile[]>([]);
 
 displayedFiles.set(
     get(sortedFiles)
+      .filter((file): file is TFile => file !== undefined)
       .slice(0, get(displayedFiles).length),
 );
 
 sortedFiles.subscribe(($sortedFiles) => {
     displayedFiles.set(
       $sortedFiles
+        .filter((file): file is TFile => file !== undefined)
         .slice(0, get(displayedFiles).length),
     );
 });
-
 displayedCount.subscribe((count) => {
     displayedFiles.set(
       get(sortedFiles)
+        .filter((file): file is TFile => file !== undefined)
         .slice(0, count),
     );
 });
@@ -120,4 +156,7 @@ export default {
     loadColorMap,
     extractColorFromFrontmatter,
     settings,
+	manualOrder,
+	saveManualOrder,
+	loadManualOrder,
 };

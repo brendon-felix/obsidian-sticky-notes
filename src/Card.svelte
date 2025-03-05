@@ -15,9 +15,12 @@
     file: TFile;
     updateLayoutNextTick: () => Promise<void>;
     color?: string;
+    onDragStart: (event: DragEvent, path: string) => void;
+    onDragOver: (event: DragEvent, path: string) => void;
+    onDrop: (event: DragEvent, path: string) => void;
   }
 
-  let { file, updateLayoutNextTick, color }: Props = $props();
+  let { file, updateLayoutNextTick, color, onDragStart, onDragOver, onDrop }: Props = $props();
 
   let contentDiv: HTMLElement | null = $state(null);
   let translateTransition: boolean = $state(false);
@@ -146,6 +149,10 @@
     isHoveringTop = false;
   };
 
+  const handleDrop = (event: DragEvent) => {
+    onDrop(event, file.path);
+  };
+
   onMount(async () => {
     const frontmatterColor = await extractColorFromFrontmatter(file);
     if (frontmatterColor) {
@@ -176,6 +183,10 @@
   style="border-color: {selectedColor};"
   onmousemove={handleMouseMove}
   onmouseleave={handleMouseLeave}
+  ondragstart={(event) => onDragStart(event, file.path)}
+  ondragover={(event) => onDragOver(event, file.path)}
+  ondrop={handleDrop}
+  draggable="true"
 >
   {#if isEditing}
     <textarea bind:value={editorContent} onfocusout={closeEditor} onkeydown={handleTextareaKeydown}></textarea>
