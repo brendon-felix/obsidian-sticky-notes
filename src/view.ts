@@ -1,8 +1,8 @@
 import { ItemView, WorkspaceLeaf, TAbstractFile, TFile } from "obsidian";
 import Root from './Root.svelte';
 import { mount, unmount } from 'svelte';
-import { derived, get, writable } from "svelte/store";
-import store, { Sort, extractColorFromFrontmatter } from "./store";
+import { get } from "svelte/store";
+import store, { extractColorFromFrontmatter } from "./store";
 import StickyNotesPlugin from "./main";
 import { manualOrder, saveManualOrder } from './store';
 

@@ -1,14 +1,10 @@
-// TODO: Implement in-card editing
-//   TODO: Make notes editable on single click
 // TODO: Add setting to configure default note color
 // TODO: Add reset button to reset note color to default
 // TODO: Add setting for naming pattern (currently Unix timestamp)
-// TODO: Create a new note button
+// TODO: Create a `+` New Note button
 // TODO: Add notification on deletion and undo option
 //   TODO: Add support for Ctrl+Z and Ctrl+Y
 // TODO: Store state of note order, color, etc.
-// TODO: Figure out a better format for automatic titles
-//   TODO: Add setting to configure automatic title format
 // TODO: Create menu for selecting note color
 // TODO: Improve layout, possibly use a single column
 // TODO: Add a search bar=
@@ -79,7 +75,6 @@ export default class StickyNotesPlugin extends Plugin {
 
 		this.addSettingTab(new StickyNotesSettingsTab(this.app, this));
 
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
