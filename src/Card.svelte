@@ -30,8 +30,8 @@
   let selectedColor: string = $state(color || "#FFD700");
   let isEditing: boolean = $state(false);
   let editorContent: string = $state("");
-  let isClosing: boolean = $state(false); // new flag to guard closeEditor
-  let textareaEl: HTMLTextAreaElement; // NEW: reference to the textarea element
+  let isClosing: boolean = $state(false);
+  let textareaEl: HTMLTextAreaElement;
 
   const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
@@ -49,21 +49,21 @@
     if (element.children.length === 0) {
       return;
     }
-    // Find block where to cut the preview
-    let lastBlockIndex: number = 0,
-      charCount: number = 0;
-    do {
-      charCount += element.children[lastBlockIndex]?.textContent?.length || 0;
-    } while (
-      lastBlockIndex < element.children.length &&
-      charCount < 300 &&
-      ++lastBlockIndex
-    );
+    // // Find block where to cut the preview
+    // let lastBlockIndex: number = 0,
+    //   charCount: number = 0;
+    // do {
+    //   charCount += element.children[lastBlockIndex]?.textContent?.length || 0;
+    // } while (
+    //   lastBlockIndex < element.children.length &&
+    //   charCount < 300 &&
+    //   ++lastBlockIndex
+    // );
 
-    // Remove all blocks after the last block
-    for (let i = element.children.length - 1; i > lastBlockIndex; i--) {
-      element.children[i]?.remove();
-    }
+    // // Remove all blocks after the last block
+    // for (let i = element.children.length - 1; i > lastBlockIndex; i--) {
+    //   element.children[i]?.remove();
+    // }
   }
 
   const renderFile = async (el: HTMLElement): Promise<void> => {
