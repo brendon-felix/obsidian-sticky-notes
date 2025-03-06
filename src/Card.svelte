@@ -27,6 +27,7 @@
   let selectedColor: string = $state(color || "#FFD700");
   let isEditing: boolean = $state(false);
   let editorContent: string = $state("");
+  let isClosing: boolean = $state(false); // new flag to guard closeEditor
 
   const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
@@ -87,6 +88,8 @@
   };
 
   const closeEditor = async () => {
+    if (isClosing) return; // prevent duplicate execution
+    isClosing = true;
     if (editorContent !== await file.vault.cachedRead(file)) {
       await file.vault.modify(file, editorContent);
       await updateLayoutNextTick();
@@ -96,6 +99,7 @@
     if (contentDiv !== null) {
       await renderFile(contentDiv);
     }
+    isClosing = false;
   };
 
   const handleCardClick = (event: MouseEvent) => {
@@ -136,6 +140,8 @@
       textarea.selectionStart = textarea.selectionEnd = start + 1;
       editorContent = textarea.value;
     } else if (event.key === "Escape" && isEditing) {
+      event.preventDefault();
+      event.stopPropagation(); // Stop further propagation to global listener
       await closeEditor();
     }
   };
