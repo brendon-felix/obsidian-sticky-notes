@@ -13,10 +13,15 @@
 //   TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to trash notes
 
+// FIX: Remove rounded corners from editable textarea
+// FIX: Make card size peristent across re-open and reload
+// FIX: Text is often blurry while editing a sticky note
 // FIX: Changing folder path setting leads to odd behavior
 // FIX: Layout is updated in the background while view port is 0 x 0
 // 		which causes invalid layouts (all stacked on top of each other)
 // FIX: Finishing implementing set frontmatter color property
+// FIX: Dragging and dropping quickly is not reliable
+// FIX: With big card size, zooming in makes the card size too big
 
 import {
 	App,
