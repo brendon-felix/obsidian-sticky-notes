@@ -1,8 +1,9 @@
+// TODO: On card hover, indicate it is clickable (modify background and/or border color)
 // TODO: Make drop ribbon menu better looking (extend top border downwards)
 // TODO: Add command to delete current sticky note
 // TODO: Suport selecting multiple notes to delete or change color or move positions
 // TODO: Add setting to configure default note color
-// TODO: Add buttons and key commands to zoom in/out of root
+// TODO: Add key commands to zoom in/out of root
 // TODO: Add reset button to reset note color to default
 // TODO: Add setting for naming pattern (currently Unix timestamp)
 // TODO: Add notification on deletion and undo option
@@ -12,9 +13,9 @@
 //   TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to trash notes
 
+// FIX: Changing folder path setting leads to odd behavior
 // FIX: Layout is updated in the background while view port is 0 x 0
 // 		which causes invalid layouts (all stacked on top of each other)
-// FIX: Border highlight on hover
 // FIX: Finishing implementing set frontmatter color property
 
 import {
