@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf, TAbstractFile, TFile } from "obsidian";
 import Root from './Root.svelte';
 import { mount, unmount } from 'svelte';
 import { get } from "svelte/store";
-import store, { extractColorFromFrontmatter } from "./store";
+import store, { extractColorFromFrontmatter, Sort } from "./store";
 import StickyNotesPlugin from "./main";
 import { manualOrder, saveManualOrder } from './store';
 
@@ -32,6 +32,7 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 		order.splice(targetIndex, 0, draggedItem!);
 		manualOrder.set(order);
 		saveManualOrder();
+		store.sort.set(Sort.Manual);
 	}
 	draggedItem = null;
 };
@@ -41,11 +42,11 @@ export class StickyNotesView extends ItemView {
 	plugin: StickyNotesPlugin;
 	lastWidth: number;
 	lastHeight: number;
-	viewContent: HTMLElement; // existing: scrolling container
-    autoScrollHandler: (event: DragEvent) => void; // existing: initial handler
-    scrollVelocity: number = 0; // new property for velocity
-    autoScrollFrameId: number | null = null; // new property for requestAnimationFrame id
-    dragEndHandler: (event: DragEvent) => void; // new property for drag end handler
+	viewContent: HTMLElement;
+    autoScrollHandler: (event: DragEvent) => void;
+    scrollVelocity: number = 0;
+    autoScrollFrameId: number | null = null;
+    dragEndHandler: (event: DragEvent) => void;
 
 	constructor(leaf: WorkspaceLeaf, plugin: StickyNotesPlugin) {
 		super(leaf);
@@ -105,13 +106,11 @@ export class StickyNotesView extends ItemView {
             } else {
                 this.scrollVelocity = 0;
             }
-            // Start loop if not already running and velocity is non-zero
             if (this.scrollVelocity !== 0 && this.autoScrollFrameId === null) {
                 this.autoScrollFrameId = requestAnimationFrame(this.autoScrollLoop);
             }
         };
         viewContent.addEventListener("dragover", this.autoScrollHandler);
-        // Add handler to stop scrolling when dragging ends
         this.dragEndHandler = (event: DragEvent) => {
             this.scrollVelocity = 0;
             if (this.autoScrollFrameId !== null) {
@@ -196,7 +195,6 @@ export class StickyNotesView extends ItemView {
 
 	async onClose() {
 		store.displayedCount.set(NUM_LOAD);
-		// Remove auto-scroll listener and cancel any pending animation
         if (this.viewContent && this.autoScrollHandler) {
             this.viewContent.removeEventListener("dragover", this.autoScrollHandler);
         }

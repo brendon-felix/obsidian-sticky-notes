@@ -3,11 +3,18 @@
   import MiniMasonry from "minimasonry";
 
   import Card from "./Card.svelte";
-  import { displayedFiles, loadColor } from "./store"; // Import loadColor function
+  import { displayedFiles, loadColor, sort, Sort } from "./store";
   export let createNewNote: () => void;
 
   let grid: MiniMasonry;
   let cardsContainer: HTMLElement;  
+
+  let selectedSort: Sort = Sort.Created;
+  sort.subscribe(value => selectedSort = value);
+  
+  const handleSortChange = () => {
+    sort.set(selectedSort);
+  };
 
   onMount(() => {
     grid = new MiniMasonry({
@@ -64,7 +71,15 @@
 </script>
 
 <div class="view-container">
-  <button class="new-note-button" onclick={createNewNote}>+</button>
+  <div class="controls">
+    <select bind:value={selectedSort} onchange={handleSortChange}>
+      <option value={Sort.Created}>Created Time</option>
+      <option value={Sort.Modified}>Modified Time</option>
+      <option value={Sort.Alphabetical}>Alphabetical</option>
+      <option value={Sort.Manual}>Manual</option>
+    </select>
+    <button class="new-note-button" onclick={createNewNote}>+</button>
+  </div>
   <div class="cards-container" bind:this={cardsContainer}>
     {#each $displayedFiles as file (file.path)}
       <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} {onDragStart} {onDragOver} {onDrop} />
@@ -76,10 +91,15 @@
   .view-container {
     position: relative;
   }
-  .new-note-button {
+  .controls {
     position: absolute;
     top: 10px;
     right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+  }
+  .new-note-button {
     width: 32px;
     height: 32px;
     border: none;
@@ -87,8 +107,15 @@
     color: var(--text-normal);
     font-size: 24px;
     cursor: pointer;
-    z-index: 10;
     border-radius: 4px;
+  }
+  select {
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    padding: 0 5px;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
   }
   .cards-container {
     position: relative;

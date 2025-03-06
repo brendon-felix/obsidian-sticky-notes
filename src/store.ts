@@ -9,14 +9,16 @@ import { derived, get, writable } from "svelte/store";
 import { type StickyNotesSettings } from "./main";
 
 export enum Sort {
-    Created = "ctime",
-    Modified = "mtime",
+	Created = "created",
+	Modified = "modified",
+	Alphabetical = "alphabetical",
+	Manual = "manual",
 }
 
 export const app = writable<App>();
 export const view = writable<ItemView>();
 export const files = writable<TFile[]>([]);
-export const sort = writable<Sort>(Sort.Modified);
+export const sort = writable<Sort>(Sort.Created);
 
 export const colorMap: Record<string, string> = {};
 
@@ -66,7 +68,7 @@ export const loadColor = (filePath: string): string | undefined => {
 
 export const extractColorFromFrontmatter = async (file: TFile): Promise<string | undefined> => {
     const content = await file.vault.cachedRead(file);
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const frontmatterMatch = content.match(/^---\n([\\s\S]*?)\n---/);
     if (frontmatterMatch) {
         const frontmatter = parseYaml(frontmatterMatch[1]);
         return frontmatter.color;
@@ -74,7 +76,7 @@ export const extractColorFromFrontmatter = async (file: TFile): Promise<string |
     return undefined;
 };
 
-export const manualOrder = writable<string[]>([]); // Store manual order of notes
+export const manualOrder = writable<string[]>([]);
 
 export const saveManualOrder = () => {
 	localStorage.setItem('stickyNotesManualOrder', JSON.stringify(get(manualOrder)));
@@ -87,16 +89,23 @@ export const loadManualOrder = () => {
 	}
 };
 
-// Load manual order when the store is initialized
 loadManualOrder();
 
 const sortedFiles = derived(
-	[manualOrder, files],
-	([$manualOrder, $files]) => {
-		if ($manualOrder.length > 0) {
-			const orderedFiles = $manualOrder.map(path => $files.find(file => file.path === path)).filter(Boolean);
+	[files, sort, manualOrder],
+	([$files, $sort, $manualOrder]) => {
+		if ($sort === Sort.Manual && $manualOrder.length > 0) {
+			const orderedFiles = $manualOrder
+				.map(path => $files.find(file => file.path === path))
+				.filter(Boolean);
 			const unorderedFiles = $files.filter(file => !$manualOrder.includes(file.path));
 			return [...orderedFiles, ...unorderedFiles];
+		} else if ($sort === Sort.Created) {
+			return $files.slice().sort((a, b) => b.stat.ctime - a.stat.ctime);
+		} else if ($sort === Sort.Modified) {
+			return $files.slice().sort((a, b) => b.stat.mtime - a.stat.mtime);
+		} else if ($sort === Sort.Alphabetical) {
+			return $files.slice().sort((a, b) => a.basename.localeCompare(b.basename));
 		}
 		return $files;
 	},
@@ -106,9 +115,7 @@ const sortedFiles = derived(
 files.subscribe((fileList) => {
 	const currentOrder = get(manualOrder);
 	const newOrder = fileList.map(file => file.path);
-	// Remove paths that no longer exist
 	const filteredOrder = currentOrder.filter(path => newOrder.includes(path));
-	// Append any missing file paths
 	const missingFiles = newOrder.filter(path => !filteredOrder.includes(path));
 	const updatedOrder = [...filteredOrder, ...missingFiles];
 	if (JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
