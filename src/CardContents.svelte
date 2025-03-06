@@ -12,6 +12,9 @@
 	let isEditing: boolean = false;
 	let editorContent: string = "";
 	let textareaEl: HTMLTextAreaElement | null = null;
+	let isClosing: boolean = false;
+	// NEW flag to avoid duplicate close from focusout after Escape
+	let closedByEscape: boolean = false;
 	
 	function postProcessor(element: HTMLElement, context: any) {
 		if (context.sourcePath !== file.path) return;
@@ -27,14 +30,24 @@
 		MarkdownPreviewRenderer.unregisterPostProcessor(postProcessor);
 	};
 	
-	const closeEditor = async () => {
-		if (editorContent !== await file.vault.cachedRead(file)) {
-			await file.vault.modify(file, editorContent);
-			await updateLayoutNextTick();
+	const closeEditor = async (saveChanges: boolean = true) => {
+		if (isClosing) return;
+		isClosing = true;
+		const originalContent = await file.vault.cachedRead(file);
+		if (saveChanges) {
+			if (editorContent !== originalContent) {
+				await file.vault.modify(file, editorContent);
+				await updateLayoutNextTick();
+			}
+		} else {
+			editorContent = originalContent;
 		}
 		isEditing = false;
 		await tick();
 		if (contentDiv !== null) await renderFile(contentDiv);
+		isClosing = false;
+		// reset the flag so that future focusouts can trigger closing if needed.
+		closedByEscape = false;
 	};
 	
 	const handleCardClick = (event: MouseEvent) => {
@@ -54,7 +67,8 @@
 	
 	const handleKeyDown = (event: KeyboardEvent) => {
 		if (event.key === "Escape" && isEditing) {
-			closeEditor();
+			closedByEscape = true;
+			closeEditor(true);
 		}
 	};
 	
@@ -71,7 +85,8 @@
 		} else if (event.key === "Escape" && isEditing) {
 			event.preventDefault();
 			event.stopPropagation();
-			await closeEditor();
+			closedByEscape = true;
+			await closeEditor(true);
 		}
 	};
 
@@ -96,7 +111,7 @@
 
 <div class="card-contents" role="button" tabindex="0" on:click={handleCardClick} on:keydown={handleKeyDown}>
 	{#if isEditing}
-		<textarea bind:this={textareaEl} bind:value={editorContent} on:focusout={closeEditor} on:keydown={handleTextareaKeydown}></textarea>
+		<textarea bind:this={textareaEl} bind:value={editorContent} on:focusout={() => { if (!isClosing && !closedByEscape) closeEditor(true); }} on:keydown={handleTextareaKeydown}></textarea>
 	{:else}
 		<div class="read-view" bind:this={contentDiv}></div>
 	{/if}
