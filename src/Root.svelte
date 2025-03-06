@@ -166,11 +166,11 @@
   .new-note-button, .size-button {
     background-color: var(--background-primary);
     color: var(--text-normal);
-    border-radius: 4px;
+    border-radius: 50%;
   }
   .new-note-button {
     width: 50px;
-    height: 32px;
+    height: 50px;
     font-size: 20px;
   }
   .size-button.increase {
