@@ -8,6 +8,8 @@
 
   let selectedSort: Sort = Sort.ModifiedDesc;
   sort.subscribe(value => selectedSort = value);
+
+  let gridRef: Grid;
   
   const handleSortChange = async () => {
     sort.set(selectedSort);
@@ -16,7 +18,6 @@
     }
   };
 
-  let gridRef: typeof Grid;
   const increaseCardSize = async () => {
     if (gridRef) await gridRef.increaseCardSize();
   };
