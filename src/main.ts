@@ -1,3 +1,5 @@
+// TODO: Add command or menu option to remove color mapping and/or manual ordering
+//   TODO: Remove all local storage data when uninstalling
 // TODO: Find better way to cut off text for efficiency (variable card size means this is not simple)
 // TODO: Add option to sort notes by color
 // TODO: On card hover, indicate it is clickable (modify background and/or border color)
@@ -160,7 +162,7 @@ class StickyNotesSettingsTab extends PluginSettingTab {
 
 		new Setting(this.containerEl)
             .setName("Sticky Notes folder location")
-            .setDesc("Sticky notes are created and viewed here.")
+            .setDesc("Sticky notes are created and viewed from here.")
             .addSearch((cb) => {
                 new FolderSuggest(this.app, cb.inputEl);
                 cb.setPlaceholder("Example: folder1/folder2")
