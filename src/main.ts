@@ -1,5 +1,7 @@
+// TODO: Add option to sort notes by color
 // TODO: On card hover, indicate it is clickable (modify background and/or border color)
 // TODO: Make drop ribbon menu better looking (extend top border downwards)
+// TODO: Emphasize the current note being edited
 // TODO: Add command to delete current sticky note
 // TODO: Suport selecting multiple notes to delete or change color or move positions
 // TODO: Add setting to configure default note color
@@ -12,6 +14,8 @@
 // TODO: Add right-click menu
 //   TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to trash notes
+// TODO: Emphasize the current color selected in color selection
+//   TODO: shift/translate outline for emphasis to show swtich in color
 
 // FIX: Support ribbon menu while editing (just shift text area instead of covering it)
 // FIX: Remove rounded corners from editable textarea

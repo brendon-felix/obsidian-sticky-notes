@@ -367,13 +367,13 @@
   .color-picker {
     display: flex;
     gap: 2px;
-    margin-right: 10px;
   }
 
   .color-option {
     width: 20px;
-    height: 20px;
+    height: 16px;
     cursor: pointer;
+    border-radius: 4px;
   }
 
   .clickable-icon {
