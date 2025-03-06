@@ -112,7 +112,7 @@ files.subscribe((fileList) => {
 	} else {
 		const missingFiles = newOrder.filter(path => !currentOrder.includes(path));
 		if (missingFiles.length > 0) {
-			manualOrder.set([...currentOrder, ...missingFiles]);
+			manualOrder.set([...missingFiles, ...currentOrder]); // ...changed: prepend missing files...
 			saveManualOrder();
 		}
 	}
@@ -142,6 +142,8 @@ displayedCount.subscribe((count) => {
     );
 });
 
+export const newStickyNote = writable<string | null>(null);
+
 export default {
     files,
     sort,
@@ -159,4 +161,5 @@ export default {
 	manualOrder,
 	saveManualOrder,
 	loadManualOrder,
+    newStickyNote, // new export
 };

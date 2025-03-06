@@ -172,7 +172,15 @@ export class StickyNotesView extends ItemView {
 			),
 		);
         store.displayedCount.set(NUM_LOAD);
-        this.root = mount(Root, { target: viewContent, props: { onDragStart, onDragOver, onDrop } }); // Pass handlers as props
+        this.root = mount(Root, { 
+            target: viewContent, 
+            props: { 
+                onDragStart, 
+                onDragOver, 
+                onDrop,
+                createNewNote: () => this.plugin.create_new_sticky_note(true)
+            } 
+        });
 		this.lastWidth = this.containerEl.clientWidth;
 		this.lastHeight = this.containerEl.clientHeight;
 

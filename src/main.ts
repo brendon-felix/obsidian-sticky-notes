@@ -24,7 +24,7 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import { StickyNotesView, VIEW_TYPE } from "./view";
-import store, { loadColorMap, settings } from "./store";
+import store, { loadColorMap, settings, newStickyNote } from "./store";
 
 import { FolderSuggest } from "./FolderSuggestor";
 
@@ -80,18 +80,21 @@ export default class StickyNotesPlugin extends Plugin {
 
 	}
 
-	async create_new_sticky_note() {
+	async create_new_sticky_note(inline: boolean = false) {
 		const root = this.app.vault.getRoot().path;
-		// const timestamp = new Date().toLocaleString().replace(/[/\\:]/g, '-');
-		const timestamp = Math.floor(Date.now() / 1000); // Unix time in seconds
+		const timestamp = Math.floor(Date.now() / 1000);
 		const filename = `${timestamp}`;
 		const path = `${root}Sticky Notes/${filename}.md`;
-		// console.log(`${path}`);
 		const created_note = await this.app.vault.create(path, "");
-		const active_leaf = this.app.workspace.getLeaf(false);
-		await active_leaf.openFile(created_note, {
-			state: { mode: "source" },
-		});
+		if (inline) {
+			newStickyNote.set(created_note.path);
+			// rely on vault event to update store.files and render a new card
+		} else {
+			const active_leaf = this.app.workspace.getLeaf(false);
+			await active_leaf.openFile(created_note, {
+				state: { mode: "source" },
+			});
+		}
 	}
 
 	async activateView() {

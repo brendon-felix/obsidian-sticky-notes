@@ -8,8 +8,9 @@
   } from "obsidian";
   import { onMount, tick, onDestroy } from "svelte"; // Import onDestroy from svelte
   import { blur } from "svelte/transition";
-  import { app, view, saveColor, extractColorFromFrontmatter } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
+  import { app, view, saveColor, extractColorFromFrontmatter, newStickyNote } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
   import { assert, is } from "tsafe";
+  import { get } from "svelte/store";
 
   interface Props {
     file: TFile;
@@ -28,6 +29,7 @@
   let isEditing: boolean = $state(false);
   let editorContent: string = $state("");
   let isClosing: boolean = $state(false); // new flag to guard closeEditor
+  let textareaEl: HTMLTextAreaElement; // NEW: reference to the textarea element
 
   const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
@@ -167,6 +169,15 @@
     if (contentDiv !== null) {
       await renderFile(contentDiv);
     }
+    // Enable editing if this card is the newly created sticky note.
+    if (get(newStickyNote) === file.path) {
+      isEditing = true;
+      newStickyNote.set(null);
+      await tick(); // wait for the textarea to be rendered
+      if (textareaEl) {
+        textareaEl.focus();
+      }
+    }
     await updateLayoutNextTick();
     translateTransition = true;
     document.addEventListener("keydown", handleKeyDown);
@@ -195,7 +206,7 @@
   draggable="true"
 >
   {#if isEditing}
-    <textarea bind:value={editorContent} onfocusout={closeEditor} onkeydown={handleTextareaKeydown}></textarea>
+    <textarea bind:this={textareaEl} bind:value={editorContent} onfocusout={closeEditor} onkeydown={handleTextareaKeydown}></textarea>
   {:else}
     <div class="read-view" bind:this={contentDiv}></div>
   {/if}
