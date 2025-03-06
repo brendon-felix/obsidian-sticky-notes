@@ -19,7 +19,13 @@ export enum Sort {
 export const app = writable<App>();
 export const view = writable<StickyNotesView>();
 export const files = writable<TFile[]>([]);
-export const sort = writable<Sort>(Sort.ModifiedDesc);
+
+// Change: Initialize sort from localStorage if available.
+const storedSort = localStorage.getItem('stickyNotesSort');
+export const sort = writable<Sort>(storedSort ? JSON.parse(storedSort) : Sort.ModifiedDesc);
+sort.subscribe(value => {
+	localStorage.setItem('stickyNotesSort', JSON.stringify(value));
+});
 
 export const colorMap: Record<string, string> = {};
 
@@ -82,6 +88,7 @@ export const extractColorFromFrontmatter = async (file: TFile): Promise<string |
 };
 
 export const manualOrder = writable<string[]>([]);
+export const manualOrderLoaded = writable(false); // new flag to indicate load complete
 
 export const saveManualOrder = () => {
     console.log("saving manual order as:", get(manualOrder));
@@ -94,6 +101,7 @@ export const loadManualOrder = () => {
         console.log("loaded manual order:", JSON.parse(savedOrder));
 		manualOrder.set(JSON.parse(savedOrder));
 	}
+	manualOrderLoaded.set(true); // mark that manual order is loaded
 };
 
 console.log("store calling loadManualOrder()");
@@ -123,14 +131,21 @@ const sortedFiles = derived(
 );
 
 files.subscribe((fileList) => {
+	// Only update manualOrder if sort is Manual and manual order has been loaded.
+	if (get(sort) !== Sort.Manual || !get(manualOrderLoaded)) return;
+	
 	const currentOrder = get(manualOrder);
-	const newOrder = fileList.map(file => file.name);
-	const filteredOrder = currentOrder.filter(name => newOrder.includes(name));
-	const missingFiles = newOrder.filter(name => !filteredOrder.includes(name));
+	const fileNames = fileList.map(file => file.name);
+	
+	// Preserve saved order for existing files.
+	const filteredOrder = currentOrder.filter(name => fileNames.includes(name));
+	// Append any new files (preserving fileList order).
+	const missingFiles = fileNames.filter(name => !filteredOrder.includes(name));
 	const updatedOrder = [...filteredOrder, ...missingFiles];
+	
 	if (JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
 		manualOrder.set(updatedOrder);
-        console.log("files subscription calling saveManualOrder()");
+		console.log("files subscription calling saveManualOrder()");
 		saveManualOrder();
 	}
 });

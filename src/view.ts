@@ -24,16 +24,34 @@ export const onDragOver = (event: DragEvent) => {
 export const onDrop = (event: DragEvent, targetPath: string) => {
 	event.preventDefault();
 	const targetName = targetPath.split('/').pop();
-	const order = get(manualOrder);
-	const draggedIndex = order.indexOf(draggedItem!);
-	const targetIndex = targetName ? order.indexOf(targetName) : -1;
-
+	const currentSort = get(store.sort);
+	let newOrder: string[] = [];
+	if (currentSort !== Sort.Manual) {
+		// Build order from current sort criteria
+		const unsortedFiles = get(store.files);
+		let sortedList = unsortedFiles.slice();
+		if (currentSort === Sort.ModifiedDesc) {
+			sortedList.sort((a, b) => b.stat.mtime - a.stat.mtime);
+		} else if (currentSort === Sort.ModifiedAsc) {
+			sortedList.sort((a, b) => a.stat.mtime - b.stat.mtime);
+		} else if (currentSort === Sort.CreatedDesc) {
+			sortedList.sort((a, b) => b.stat.ctime - a.stat.ctime);
+		} else if (currentSort === Sort.CreatedAsc) {
+			sortedList.sort((a, b) => a.stat.ctime - b.stat.ctime);
+		}
+		newOrder = sortedList.map(file => file.name);
+	} else {
+		newOrder = get(manualOrder);
+	}
+	const draggedIndex = newOrder.indexOf(draggedItem!);
+	const targetIndex = targetName ? newOrder.indexOf(targetName) : -1;
 	if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-		order.splice(draggedIndex, 1);
-		order.splice(targetIndex, 0, draggedItem!);
-		manualOrder.set(order);
+		newOrder.splice(draggedIndex, 1);
+		newOrder.splice(targetIndex, 0, draggedItem!);
+		manualOrder.set(newOrder);
 		console.log("onDrop() calling saveManualOrder()");
 		saveManualOrder();
+		// Switch to manual sort so the moved card stays in place.
 		store.sort.set(Sort.Manual);
 		// Trigger grid update after reordering
 		const viewInstance = get(store.view);

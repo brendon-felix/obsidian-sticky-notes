@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { get } from "svelte/store";
   import Grid from "./Grid.svelte";
-  import { sort, Sort } from "./store";
+  import { sort, Sort, files, manualOrder, saveManualOrder } from "./store";
   export let createNewNote: () => void;
   export let onDragStart;
   export let onDragOver;
@@ -13,6 +14,22 @@
   
   const handleSortChange = async () => {
     sort.set(selectedSort);
+    if (selectedSort !== Sort.Manual) {
+      const unsortedFiles = get(files);
+      let sortedList = unsortedFiles.slice();
+      if (selectedSort === Sort.ModifiedDesc) {
+        sortedList.sort((a, b) => b.stat.mtime - a.stat.mtime);
+      } else if (selectedSort === Sort.ModifiedAsc) {
+        sortedList.sort((a, b) => a.stat.mtime - b.stat.mtime);
+      } else if (selectedSort === Sort.CreatedDesc) {
+        sortedList.sort((a, b) => b.stat.ctime - a.stat.ctime);
+      } else if (selectedSort === Sort.CreatedAsc) {
+        sortedList.sort((a, b) => a.stat.ctime - b.stat.ctime);
+      }
+      const newOrder = sortedList.map(file => file.name);
+      manualOrder.set(newOrder);
+      saveManualOrder();
+    }
     if (gridRef?.updateLayoutNextTick) {
       await gridRef.updateLayoutNextTick();
     }
