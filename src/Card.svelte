@@ -343,7 +343,7 @@
     background-color: var(--background-primary);
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0 10px;
     border-bottom: 1px solid var(--background-modifier-border);
     transition: top 0.2s ease-in-out;

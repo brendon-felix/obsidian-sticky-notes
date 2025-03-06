@@ -1,9 +1,10 @@
-// TODO: Add auto-sort button with options for sorting (mtime, ctime, color)
+// TODO: Make drop ribbon menu better looking (extend top border downwards)
+// TODO: Add command to delete current sticky note
+// TODO: Suport selecting multiple notes to delete or change color or move positions
 // TODO: Add setting to configure default note color
 // TODO: Add buttons and key commands to zoom in/out of root
 // TODO: Add reset button to reset note color to default
 // TODO: Add setting for naming pattern (currently Unix timestamp)
-// TODO: Create a `+` New Note button
 // TODO: Add notification on deletion and undo option
 //   TODO: Add support for Ctrl+Z and Ctrl+Y
 // TODO: Add a search bar
