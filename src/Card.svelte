@@ -9,7 +9,6 @@
   import { onMount, tick, onDestroy } from "svelte"; // Import onDestroy from svelte
   import { blur } from "svelte/transition";
   import { app, view, saveColor, extractColorFromFrontmatter, newStickyNote, manualOrder, saveManualOrder } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
-  import { assert, is } from "tsafe";
   import { get } from "svelte/store";
 
   interface Props {
