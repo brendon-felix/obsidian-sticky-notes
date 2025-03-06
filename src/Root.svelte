@@ -16,10 +16,16 @@
     sort.set(selectedSort);
   };
 
-  const FACTOR = 1.1;
+  const FACTOR = 1.5;
+  const MIN_CARD_SIZE = 150;
 
   let cardWidth = 300;
   let cardHeight = 300;
+
+  const getMaxCardSize = () => {
+    const containerWidth = cardsContainer.clientWidth;
+    return containerWidth - 20; // Maximum card size is half the container width
+  };
 
   const recreateGrid = async () => {
     grid.destroy();
@@ -36,13 +42,16 @@
   };
 
   const increaseCardSize = async () => {
-    cardWidth *= FACTOR;
-    cardHeight *= FACTOR;
-    await recreateGrid();
+    const maxCardSize = getMaxCardSize();
+    if (cardWidth * FACTOR <= maxCardSize && cardHeight * FACTOR <= maxCardSize) {
+      cardWidth *= FACTOR;
+      cardHeight *= FACTOR;
+      await recreateGrid();
+    }
   };
 
   const decreaseCardSize = async () => {
-    if (cardWidth > 100 && cardHeight > 100) {
+    if (cardWidth > MIN_CARD_SIZE && cardHeight > MIN_CARD_SIZE) {
       cardWidth /= FACTOR;
       cardHeight /= FACTOR;
       await recreateGrid();
