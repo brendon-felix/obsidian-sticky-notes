@@ -13,6 +13,7 @@
 //   TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to trash notes
 
+// FIX: Support ribbon menu while editing (just shift text area instead of covering it)
 // FIX: Remove rounded corners from editable textarea
 // FIX: Make card size peristent across re-open and reload
 // FIX: Text is often blurry while editing a sticky note
