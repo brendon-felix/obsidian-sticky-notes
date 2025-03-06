@@ -9,16 +9,17 @@ import { derived, get, writable } from "svelte/store";
 import { type StickyNotesSettings } from "./main";
 
 export enum Sort {
-	Created = "created",
-	Modified = "modified",
-	Alphabetical = "alphabetical",
+	ModifiedDesc = "modifiedDesc",   // new to old
+	ModifiedAsc = "modifiedAsc",     // old to new
+	CreatedDesc = "createdDesc",     // new to old
+	CreatedAsc = "createdAsc",       // old to new
 	Manual = "manual",
 }
 
 export const app = writable<App>();
 export const view = writable<ItemView>();
 export const files = writable<TFile[]>([]);
-export const sort = writable<Sort>(Sort.Created);
+export const sort = writable<Sort>(Sort.ModifiedDesc);
 
 export const colorMap: Record<string, string> = {};
 
@@ -100,12 +101,14 @@ const sortedFiles = derived(
 				.filter(Boolean);
 			const unorderedFiles = $files.filter(file => !$manualOrder.includes(file.path));
 			return [...orderedFiles, ...unorderedFiles];
-		} else if ($sort === Sort.Created) {
-			return $files.slice().sort((a, b) => b.stat.ctime - a.stat.ctime);
-		} else if ($sort === Sort.Modified) {
+		} else if ($sort === Sort.ModifiedDesc) {
 			return $files.slice().sort((a, b) => b.stat.mtime - a.stat.mtime);
-		} else if ($sort === Sort.Alphabetical) {
-			return $files.slice().sort((a, b) => a.basename.localeCompare(b.basename));
+		} else if ($sort === Sort.ModifiedAsc) {
+			return $files.slice().sort((a, b) => a.stat.mtime - b.stat.mtime);
+		} else if ($sort === Sort.CreatedDesc) {
+			return $files.slice().sort((a, b) => b.stat.ctime - a.stat.ctime);
+		} else if ($sort === Sort.CreatedAsc) {
+			return $files.slice().sort((a, b) => a.stat.ctime - b.stat.ctime);
 		}
 		return $files;
 	},

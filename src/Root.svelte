@@ -9,7 +9,7 @@
   let grid: MiniMasonry;
   let cardsContainer: HTMLElement;  
 
-  let selectedSort: Sort = Sort.Created;
+  let selectedSort: Sort = Sort.ModifiedDesc;
   sort.subscribe(value => selectedSort = value);
   
   const handleSortChange = () => {
@@ -73,9 +73,10 @@
 <div class="view-container">
   <div class="controls">
     <select bind:value={selectedSort} onchange={handleSortChange}>
-      <option value={Sort.Created}>Created Time</option>
-      <option value={Sort.Modified}>Modified Time</option>
-      <option value={Sort.Alphabetical}>Alphabetical</option>
+      <option value={Sort.ModifiedDesc}>Modified time (new to old)</option>
+      <option value={Sort.ModifiedAsc}>Modified time (old to new)</option>
+      <option value={Sort.CreatedDesc}>Created time (new to old)</option>
+      <option value={Sort.CreatedAsc}>Created time (old to new)</option>
       <option value={Sort.Manual}>Manual</option>
     </select>
     <button class="new-note-button" onclick={createNewNote}>+</button>
