@@ -72,6 +72,7 @@
 
 <div class="view-container">
   <div class="controls">
+    <button class="new-note-button" onclick={createNewNote}>+</button>
     <select bind:value={selectedSort} onchange={handleSortChange}>
       <option value={Sort.ModifiedDesc}>Modified time (new to old)</option>
       <option value={Sort.ModifiedAsc}>Modified time (old to new)</option>
@@ -79,7 +80,6 @@
       <option value={Sort.CreatedAsc}>Created time (old to new)</option>
       <option value={Sort.Manual}>Manual</option>
     </select>
-    <button class="new-note-button" onclick={createNewNote}>+</button>
   </div>
   <div class="cards-container" bind:this={cardsContainer}>
     {#each $displayedFiles as file (file.path)}
@@ -95,7 +95,7 @@
   .controls {
     position: absolute;
     top: 10px;
-    right: 10px;
+    left: 10px; /* changed from right: 10px */
     display: flex;
     gap: 10px;
     z-index: 10;
