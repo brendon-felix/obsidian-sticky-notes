@@ -1,3 +1,4 @@
+// TODO: When newly created note is not at the beginning, scroll to it
 // TODO: Add command or menu option to remove color mapping and/or manual ordering
 //   TODO: Remove all local storage data when uninstalling
 // TODO: Find better way to cut off text for efficiency (variable card size means this is not simple)
@@ -20,9 +21,9 @@
 // TODO: Emphasize the current color selected in color selection
 //   TODO: shift/translate outline for emphasis to show swtich in color
 
+// FIX: Make card size peristent across re-open and reload
 // FIX: Support ribbon menu while editing (just shift text area instead of covering it)
 // FIX: Remove rounded corners from editable textarea
-// FIX: Make card size peristent across re-open and reload
 // FIX: Text is often blurry while editing a sticky note
 // FIX: Changing folder path setting leads to odd behavior
 // FIX: Layout is updated in the background while view port is 0 x 0
