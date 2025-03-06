@@ -1,3 +1,4 @@
+// TODO: Find better way to cut off text for efficiency (variable card size means this is not simple)
 // TODO: Add option to sort notes by color
 // TODO: On card hover, indicate it is clickable (modify background and/or border color)
 // TODO: Make drop ribbon menu better looking (extend top border downwards)
