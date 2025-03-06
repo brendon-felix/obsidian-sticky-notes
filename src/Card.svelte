@@ -31,7 +31,7 @@
   let isEditing: boolean = $state(false);
   let editorContent: string = $state("");
   let isClosing: boolean = $state(false);
-  let textareaEl: HTMLTextAreaElement;
+  let textareaEl: HTMLTextAreaElement | null = $state(null);
 
   const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
 
