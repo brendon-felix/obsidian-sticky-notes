@@ -8,7 +8,7 @@
   } from "obsidian";
   import { onMount, tick, onDestroy } from "svelte"; // Import onDestroy from svelte
   import { blur } from "svelte/transition";
-  import { app, view, saveColor, extractColorFromFrontmatter, newStickyNote } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
+  import { app, view, saveColor, extractColorFromFrontmatter, newStickyNote, manualOrder, saveManualOrder } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
   import { assert, is } from "tsafe";
   import { get } from "svelte/store";
 
@@ -75,6 +75,8 @@
   const trashFile = async (e: Event) => {
     e.stopPropagation();
     await file.vault.trash(file, true);
+    manualOrder.update(order => order.filter(path => path !== file.path));
+    saveManualOrder();
     await updateLayoutNextTick();
   };
 

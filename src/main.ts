@@ -25,6 +25,7 @@ import {
 } from 'obsidian';
 import { StickyNotesView, VIEW_TYPE } from "./view";
 import store, { loadColorMap, settings, newStickyNote } from "./store";
+import { manualOrder, saveManualOrder } from "./store";
 
 import { FolderSuggest } from "./FolderSuggestor";
 
@@ -88,6 +89,8 @@ export default class StickyNotesPlugin extends Plugin {
 		const created_note = await this.app.vault.create(path, "");
 		if (inline) {
 			newStickyNote.set(created_note.path);
+			manualOrder.update(order => [created_note.path, ...order.filter(p => p !== created_note.path)]);
+			saveManualOrder();
 			// rely on vault event to update store.files and render a new card
 		} else {
 			const active_leaf = this.app.workspace.getLeaf(false);

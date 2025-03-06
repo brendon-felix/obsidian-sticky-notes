@@ -106,15 +106,14 @@ const sortedFiles = derived(
 files.subscribe((fileList) => {
 	const currentOrder = get(manualOrder);
 	const newOrder = fileList.map(file => file.path);
-	if (currentOrder.length === 0) {
-		manualOrder.set(newOrder);
+	// Remove paths that no longer exist
+	const filteredOrder = currentOrder.filter(path => newOrder.includes(path));
+	// Append any missing file paths
+	const missingFiles = newOrder.filter(path => !filteredOrder.includes(path));
+	const updatedOrder = [...filteredOrder, ...missingFiles];
+	if (JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
+		manualOrder.set(updatedOrder);
 		saveManualOrder();
-	} else {
-		const missingFiles = newOrder.filter(path => !currentOrder.includes(path));
-		if (missingFiles.length > 0) {
-			manualOrder.set([...missingFiles, ...currentOrder]); // ...changed: prepend missing files...
-			saveManualOrder();
-		}
 	}
 });
 

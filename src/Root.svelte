@@ -66,7 +66,7 @@
 <div class="view-container">
   <button class="new-note-button" on:click={createNewNote}>+</button>
   <div class="cards-container" bind:this={cardsContainer}>
-    {#each $displayedFiles as file (file.path + file.stat.mtime)}
+    {#each $displayedFiles as file (file.path)}
       <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} {onDragStart} {onDragOver} {onDrop} />
     {/each}
   </div>
