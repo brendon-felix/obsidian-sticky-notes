@@ -41,6 +41,11 @@ export class StickyNotesView extends ItemView {
 	plugin: StickyNotesPlugin;
 	lastWidth: number;
 	lastHeight: number;
+	viewContent: HTMLElement; // existing: scrolling container
+    autoScrollHandler: (event: DragEvent) => void; // existing: initial handler
+    scrollVelocity: number = 0; // new property for velocity
+    autoScrollFrameId: number | null = null; // new property for requestAnimationFrame id
+    dragEndHandler: (event: DragEvent) => void; // new property for drag end handler
 
 	constructor(leaf: WorkspaceLeaf, plugin: StickyNotesPlugin) {
 		super(leaf);
@@ -68,8 +73,54 @@ export class StickyNotesView extends ItemView {
 		}
 	}
 
+    // new method to update scrolling on every animation frame
+    autoScrollLoop = () => {
+        this.viewContent.scrollTop += this.scrollVelocity;
+        if (this.scrollVelocity !== 0) {
+            this.autoScrollFrameId = requestAnimationFrame(this.autoScrollLoop);
+        } else {
+            this.autoScrollFrameId = null;
+        }
+    };
+
 	async onOpen() {
-        const viewContent = this.containerEl.children[1];
+        const viewContent = this.containerEl.children[1] as HTMLElement;
+        this.viewContent = viewContent;
+        // Update auto-scroll handler to compute velocity based on proximity to edge
+        this.autoScrollHandler = (event: DragEvent) => {
+            const rect = viewContent.getBoundingClientRect();
+            const threshold = 50;
+            // Reset velocity if not dragging
+            if (!draggedItem) {
+                this.scrollVelocity = 0;
+                return;
+            }
+            const maxSpeed = 20; // updated maximum scroll speed (was 10)
+            const topDistance = event.clientY - rect.top;
+            const bottomDistance = rect.bottom - event.clientY;
+            if (topDistance < threshold) {
+                this.scrollVelocity = -maxSpeed * (1 - topDistance / threshold);
+            } else if (bottomDistance < threshold) {
+                this.scrollVelocity = maxSpeed * (1 - bottomDistance / threshold);
+            } else {
+                this.scrollVelocity = 0;
+            }
+            // Start loop if not already running and velocity is non-zero
+            if (this.scrollVelocity !== 0 && this.autoScrollFrameId === null) {
+                this.autoScrollFrameId = requestAnimationFrame(this.autoScrollLoop);
+            }
+        };
+        viewContent.addEventListener("dragover", this.autoScrollHandler);
+        // Add handler to stop scrolling when dragging ends
+        this.dragEndHandler = (event: DragEvent) => {
+            this.scrollVelocity = 0;
+            if (this.autoScrollFrameId !== null) {
+                cancelAnimationFrame(this.autoScrollFrameId);
+                this.autoScrollFrameId = null;
+            }
+            draggedItem = null;
+        };
+        document.addEventListener("dragend", this.dragEndHandler);
         store.view.set(this);
         let md_files = this.app.vault.getMarkdownFiles();
 		const folderPath = this.plugin.settings.sticky_notes_folder;
@@ -137,6 +188,15 @@ export class StickyNotesView extends ItemView {
 
 	async onClose() {
 		store.displayedCount.set(NUM_LOAD);
+		// Remove auto-scroll listener and cancel any pending animation
+        if (this.viewContent && this.autoScrollHandler) {
+            this.viewContent.removeEventListener("dragover", this.autoScrollHandler);
+        }
+        document.removeEventListener("dragend", this.dragEndHandler);
+        if (this.autoScrollFrameId !== null) {
+            cancelAnimationFrame(this.autoScrollFrameId);
+            this.autoScrollFrameId = null;
+        }
 		if (this.root) {
 			unmount(this.root);
 		}
