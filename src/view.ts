@@ -13,8 +13,8 @@ export const NUM_LOAD = 20;
 let draggedItem: string | null = null;
 
 export const onDragStart = (event: DragEvent, path: string) => {
-	draggedItem = path;
-	event.dataTransfer?.setData('text/plain', path);
+	draggedItem = path.split('/').pop() ?? null;
+    event.dataTransfer?.setData('text/plain', draggedItem!);
 };
 
 export const onDragOver = (event: DragEvent) => {
@@ -23,9 +23,10 @@ export const onDragOver = (event: DragEvent) => {
 
 export const onDrop = (event: DragEvent, targetPath: string) => {
 	event.preventDefault();
+	const targetName = targetPath.split('/').pop();
 	const order = get(manualOrder);
 	const draggedIndex = order.indexOf(draggedItem!);
-	const targetIndex = order.indexOf(targetPath);
+	const targetIndex = targetName ? order.indexOf(targetName) : -1;
 
 	if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
 		order.splice(draggedIndex, 1);
@@ -124,7 +125,7 @@ export class StickyNotesView extends ItemView {
 		for (const file of md_files) {
 			const color = await extractColorFromFrontmatter(file);
 			if (color) {
-				store.saveColor(file.path, color);
+				store.saveColor(file.name, color);
 			}
 		}
         store.files.set(md_files);

@@ -36,6 +36,7 @@ export const loadColorMap = () => {
 export const settings = writable<StickyNotesSettings>();
 
 export const saveColor = async (filePath: string, color: string) => {
+    const fileName = filePath.split('/').pop();
     const currentSettings = get(settings);
     if (currentSettings.set_color_in_frontmatter) {
         // const file = get(app).vault.getAbstractFileByPath(filePath) as TFile;
@@ -57,13 +58,16 @@ export const saveColor = async (filePath: string, color: string) => {
         // }
 		console.log("Setting color in frontmatter is not implemented yet.");
     } else {
-		colorMap[filePath] = color;
-		saveColorMap();
+        if (fileName) {
+            colorMap[fileName] = color;
+            saveColorMap();
+        }
 	}
 };
 
 export const loadColor = (filePath: string): string | undefined => {
-    return colorMap[filePath];
+    const fileName = filePath.split('/').pop();
+    return fileName ? colorMap[fileName] : undefined;
 };
 
 export const extractColorFromFrontmatter = async (file: TFile): Promise<string | undefined> => {
@@ -79,12 +83,14 @@ export const extractColorFromFrontmatter = async (file: TFile): Promise<string |
 export const manualOrder = writable<string[]>([]);
 
 export const saveManualOrder = () => {
+    console.log("saving manual order as:", get(manualOrder));
 	localStorage.setItem('stickyNotesManualOrder', JSON.stringify(get(manualOrder)));
 };
 
 export const loadManualOrder = () => {
 	const savedOrder = localStorage.getItem('stickyNotesManualOrder');
 	if (savedOrder) {
+        console.log("loaded manual order:", JSON.parse(savedOrder));
 		manualOrder.set(JSON.parse(savedOrder));
 	}
 };
@@ -96,9 +102,9 @@ const sortedFiles = derived(
 	([$files, $sort, $manualOrder]) => {
 		if ($sort === Sort.Manual && $manualOrder.length > 0) {
 			const orderedFiles = $manualOrder
-				.map(path => $files.find(file => file.path === path))
+				 .map(name => $files.find(file => file.name === name))
 				.filter(Boolean);
-			const unorderedFiles = $files.filter(file => !$manualOrder.includes(file.path));
+			const unorderedFiles = $files.filter(file => !$manualOrder.includes(file.name));
 			return [...orderedFiles, ...unorderedFiles];
 		} else if ($sort === Sort.ModifiedDesc) {
 			return $files.slice().sort((a, b) => b.stat.mtime - a.stat.mtime);
@@ -116,12 +122,13 @@ const sortedFiles = derived(
 
 files.subscribe((fileList) => {
 	const currentOrder = get(manualOrder);
-	const newOrder = fileList.map(file => file.path);
-	const filteredOrder = currentOrder.filter(path => newOrder.includes(path));
-	const missingFiles = newOrder.filter(path => !filteredOrder.includes(path));
+	const newOrder = fileList.map(file => file.name);
+	const filteredOrder = currentOrder.filter(name => newOrder.includes(name));
+	const missingFiles = newOrder.filter(name => !filteredOrder.includes(name));
 	const updatedOrder = [...filteredOrder, ...missingFiles];
 	if (JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
 		manualOrder.set(updatedOrder);
+        console.log("files subscription calling saveManualOrder()");
 		saveManualOrder();
 	}
 });

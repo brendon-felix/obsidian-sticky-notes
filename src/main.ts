@@ -43,7 +43,7 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import { StickyNotesView, VIEW_TYPE } from "./view";
-import store, { loadColorMap, settings, newStickyNote } from "./store";
+import store, { loadColorMap, settings, newStickyNote, displayedCount } from "./store";
 import { manualOrder, saveManualOrder } from "./store";
 
 import { FolderSuggest } from "./FolderSuggestor";
@@ -108,8 +108,10 @@ export default class StickyNotesPlugin extends Plugin {
 		const created_note = await this.app.vault.create(path, "");
 		if (inline) {
 			newStickyNote.set(created_note.path);
-			manualOrder.update(order => [created_note.path, ...order.filter(p => p !== created_note.path)]);
+			manualOrder.update(order => [created_note.name, ...order.filter(p => p !== created_note.name)]);
+			console.log("create_new_sticky_note() calling saveManualOrder()");
 			saveManualOrder();
+			displayedCount.update(count => count + 1); // Increase the displayed count
 		} else {
 			const active_leaf = this.app.workspace.getLeaf(false);
 			await active_leaf.openFile(created_note, {

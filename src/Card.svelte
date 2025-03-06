@@ -77,6 +77,7 @@
     e.stopPropagation();
     await file.vault.trash(file, true);
     manualOrder.update(order => order.filter(path => path !== file.path));
+    console.log("trashFile() calling saveManualOrder()");
     saveManualOrder();
     await tick();
     window.dispatchEvent(new Event("resize"));
@@ -90,7 +91,7 @@
 
   const changeColor = async (newColor: string) => {
     selectedColor = newColor;
-    await saveColor(file.path, newColor);
+    await saveColor(file.name, newColor);
     updateLayoutNextTick();
   };
 
@@ -163,7 +164,7 @@
   };
 
   const handleDrop = (event: DragEvent) => {
-    onDrop(event, file.path);
+    onDrop(event, file.name);
   };
 
   onMount(async () => {
