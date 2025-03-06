@@ -95,6 +95,7 @@ export const loadManualOrder = () => {
 	}
 };
 
+console.log("store calling loadManualOrder()");
 loadManualOrder();
 
 const sortedFiles = derived(

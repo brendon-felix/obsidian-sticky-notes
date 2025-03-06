@@ -32,6 +32,7 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 		order.splice(draggedIndex, 1);
 		order.splice(targetIndex, 0, draggedItem!);
 		manualOrder.set(order);
+		console.log("onDrop() calling saveManualOrder()");
 		saveManualOrder();
 		store.sort.set(Sort.Manual);
 	}
