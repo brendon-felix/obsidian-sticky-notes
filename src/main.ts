@@ -1,15 +1,14 @@
+// TODO: Add auto-sort button with options for sorting (mtime, ctime, color)
 // TODO: Add setting to configure default note color
+// TODO: Add buttons and key commands to zoom in/out of root
 // TODO: Add reset button to reset note color to default
 // TODO: Add setting for naming pattern (currently Unix timestamp)
 // TODO: Create a `+` New Note button
 // TODO: Add notification on deletion and undo option
 //   TODO: Add support for Ctrl+Z and Ctrl+Y
-// TODO: Store state of note order, color, etc.
-// TODO: Create menu for selecting note color
-// TODO: Improve layout, possibly use a single column
-// TODO: Add a search bar=
-// TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
-// TODO: Add drag and drop functionality to reorder notes
+// TODO: Add a search bar
+// TODO: Add right-click menu
+//   TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to trash notes
 
 // FIX: Layout is updated in the background while view port is 0 x 0
