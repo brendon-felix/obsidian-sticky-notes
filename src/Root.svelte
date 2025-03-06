@@ -106,6 +106,8 @@
 <div class="view-container">
   <div class="controls">
     <button class="new-note-button" onclick={createNewNote} title="Create a new sticky note">✚</button>
+  </div>
+  <div class="right-controls">
     <select bind:value={selectedSort} onchange={handleSortChange} title="Sort by">
       <option value={Sort.ModifiedDesc}>Modified time (new to old)</option>
       <option value={Sort.ModifiedAsc}>Modified time (old to new)</option>
@@ -113,11 +115,11 @@
       <option value={Sort.CreatedAsc}>Created time (old to new)</option>
       <option value={Sort.Manual}>Manual</option>
     </select>
-  </div>
-  <div class="size-controls">
-    <button class="size-button increase" onclick={increaseCardSize} title="Increase size">+</button>
-    <span class="size-icon" title="Current card size">📏</span>
-    <button class="size-button decrease" onclick={decreaseCardSize} title="Decrease size">-</button>
+    <div class="size-controls">
+      <button class="size-button increase" onclick={increaseCardSize} title="Increase size">+</button>
+      <span class="size-icon" title="Current card size">📏</span>
+      <button class="size-button decrease" onclick={decreaseCardSize} title="Decrease size">-</button>
+    </div>
   </div>
   <div class="cards-container" bind:this={cardsContainer}>
     {#each $displayedFiles as file (file.path)}
@@ -133,35 +135,34 @@
   .controls {
     position: absolute;
     top: 10px;
-    left: 10px; /* changed from right: 10px */
+    left: 10px;
     display: flex;
     gap: 10px;
     z-index: 10;
   }
-  .size-controls {
+  .right-controls {
     position: absolute;
     top: 10px;
     right: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px; /* Add some space between the sort selector and the size controls */
     z-index: 10;
   }
+  .size-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
   .new-note-button, .size-button {
-    width: 32px;
-    height: 32px;
-    border: none;
     background-color: var(--background-primary);
     color: var(--text-normal);
-    font-size: 24px;
-    cursor: pointer;
     border-radius: 4px;
   }
   .new-note-button {
-    width: 40px;
-    height: 40px;
-    font-size: 28px;
-    border-radius: 50%;
+    width: 50px;
+    height: 32px;
+    font-size: 20px;
   }
   .size-button.increase {
     background-color: var(--background-success);
