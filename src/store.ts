@@ -3,7 +3,6 @@ import {
     ItemView,
     TFile,
     parseYaml,
-    stringifyYaml,
 } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { type StickyNotesSettings } from "./main";
@@ -170,5 +169,5 @@ export default {
 	manualOrder,
 	saveManualOrder,
 	loadManualOrder,
-    newStickyNote, // new export
+    newStickyNote,
 };

@@ -65,14 +65,13 @@ export default class StickyNotesPlugin extends Plugin {
 		await this.loadSettings();
 		store.app.set(this.app);
 		settings.set(this.settings);
-		loadColorMap(); // Load the colorMap when the plugin is loaded
+		loadColorMap();
 
 		this.registerView(
 			VIEW_TYPE,
 			(leaf) => new StickyNotesView(leaf, this)
 		);
 
-		// This creates an icon in the left ribbon.
 		this.addRibbonIcon('sticky-note', 'Sticky Notes', () => {
 			this.activateView();
 		});
@@ -111,7 +110,6 @@ export default class StickyNotesPlugin extends Plugin {
 			newStickyNote.set(created_note.path);
 			manualOrder.update(order => [created_note.path, ...order.filter(p => p !== created_note.path)]);
 			saveManualOrder();
-			// rely on vault event to update store.files and render a new card
 		} else {
 			const active_leaf = this.app.workspace.getLeaf(false);
 			await active_leaf.openFile(created_note, {

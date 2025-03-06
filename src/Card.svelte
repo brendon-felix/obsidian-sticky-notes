@@ -6,7 +6,7 @@
     setIcon,
     TFile,
   } from "obsidian";
-  import { onMount, tick, onDestroy } from "svelte"; // Import onDestroy from svelte
+  import { onMount, tick, onDestroy } from "svelte";
   import { blur } from "svelte/transition";
   import { app, view, saveColor, extractColorFromFrontmatter, newStickyNote, manualOrder, saveManualOrder } from "./store"; // Import saveColor and extractColorFromFrontmatter functions
   import { get } from "svelte/store";
@@ -90,19 +90,19 @@
 
   const changeColor = async (newColor: string) => {
     selectedColor = newColor;
-    await saveColor(file.path, newColor); // Save the selected color
-    updateLayoutNextTick(); // Ensure the layout is updated after changing the color
+    await saveColor(file.path, newColor);
+    updateLayoutNextTick();
   };
 
   const closeEditor = async () => {
-    if (isClosing) return; // prevent duplicate execution
+    if (isClosing) return;
     isClosing = true;
     if (editorContent !== await file.vault.cachedRead(file)) {
       await file.vault.modify(file, editorContent);
       await updateLayoutNextTick();
     }
     isEditing = false;
-    await tick(); // Wait for the DOM to update
+    await tick();
     if (contentDiv !== null) {
       await renderFile(contentDiv);
     }
@@ -148,7 +148,7 @@
       editorContent = textarea.value;
     } else if (event.key === "Escape" && isEditing) {
       event.preventDefault();
-      event.stopPropagation(); // Stop further propagation to global listener
+      event.stopPropagation();
       await closeEditor();
     }
   };
@@ -174,11 +174,10 @@
     if (contentDiv !== null) {
       await renderFile(contentDiv);
     }
-    // Enable editing if this card is the newly created sticky note.
     if (get(newStickyNote) === file.path) {
       isEditing = true;
       newStickyNote.set(null);
-      await tick(); // wait for the textarea to be rendered
+      await tick();
       if (textareaEl) {
         textareaEl.focus();
       }
@@ -192,7 +191,6 @@
     document.removeEventListener("keydown", handleKeyDown);
   });
 
-  // Add re-layout on card destroy to update the grid after a card is removed.
   onDestroy(() => {
     updateLayoutNextTick();
   });
@@ -253,7 +251,6 @@
     word-wrap: break-word;
     overflow-y: hidden;
     margin: 0;
-    /* width and height are now dynamic */
   }
   
   .card.transition {
@@ -293,7 +290,6 @@
     width: 100%;
   }
 
-  /* Images embeds alone in a paragraph */
   .card :global(p:has(> span.image-embed):not(:has(br)) span.image-embed) {
     display: block;
     & :global(img) {
@@ -301,12 +297,10 @@
     }
   }
 
-  /* Image embeds followed by line break in same paragraph */
   .card :global(p:has(> span.image-embed):has(br) span.image-embed) {
     display: inline-block;
   }
 
-  /** Embed notes */
   .card :global(p:has(> span.markdown-embed)),
   .card :global(.block-language-dataview) {
     overflow: hidden;
@@ -348,7 +342,7 @@
     justify-content: space-between;
     padding: 0 10px;
     border-bottom: 1px solid var(--background-modifier-border);
-    border-top: 0px solid var(--background-modifier-border); /* Extend the top border */
+    border-top: 0px solid var(--background-modifier-border);
     transition: top 0.2s ease-in-out;
   }
 

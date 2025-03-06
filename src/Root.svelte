@@ -24,7 +24,7 @@
 
   const getMaxCardSize = () => {
     const containerWidth = cardsContainer.clientWidth;
-    return containerWidth - 20; // Maximum card size is half the container width
+    return containerWidth - 20;
   };
 
   const recreateGrid = async () => {
@@ -155,7 +155,7 @@
     right: 10px;
     display: flex;
     align-items: center;
-    gap: 20px; /* Add some space between the sort selector and the size controls */
+    gap: 20px;
     z-index: 10;
   }
   .size-controls {

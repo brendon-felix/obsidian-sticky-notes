@@ -74,7 +74,6 @@ export class StickyNotesView extends ItemView {
 		}
 	}
 
-    // new method to update scrolling on every animation frame
     autoScrollLoop = () => {
         this.viewContent.scrollTop += this.scrollVelocity;
         if (this.scrollVelocity !== 0) {
@@ -87,16 +86,14 @@ export class StickyNotesView extends ItemView {
 	async onOpen() {
         const viewContent = this.containerEl.children[1] as HTMLElement;
         this.viewContent = viewContent;
-        // Update auto-scroll handler to compute velocity based on proximity to edge
         this.autoScrollHandler = (event: DragEvent) => {
             const rect = viewContent.getBoundingClientRect();
             const threshold = 50;
-            // Reset velocity if not dragging
             if (!draggedItem) {
                 this.scrollVelocity = 0;
                 return;
             }
-            const maxSpeed = 20; // updated maximum scroll speed (was 10)
+            const maxSpeed = 20;
             const topDistance = event.clientY - rect.top;
             const bottomDistance = rect.bottom - event.clientY;
             if (topDistance < threshold) {
