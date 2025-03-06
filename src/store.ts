@@ -6,6 +6,7 @@ import {
 } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { type StickyNotesSettings } from "./main";
+import { StickyNotesView } from "./view";
 
 export enum Sort {
 	ModifiedDesc = "modifiedDesc",   // new to old
@@ -16,7 +17,7 @@ export enum Sort {
 }
 
 export const app = writable<App>();
-export const view = writable<ItemView>();
+export const view = writable<StickyNotesView>();
 export const files = writable<TFile[]>([]);
 export const sort = writable<Sort>(Sort.ModifiedDesc);
 

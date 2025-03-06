@@ -35,6 +35,9 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 		console.log("onDrop() calling saveManualOrder()");
 		saveManualOrder();
 		store.sort.set(Sort.Manual);
+		// Trigger grid update after reordering
+		const viewInstance = get(store.view);
+		viewInstance?.root?.updateLayoutNextTick();
 	}
 	draggedItem = null;
 };

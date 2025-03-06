@@ -1,115 +1,35 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
-  import MiniMasonry from "minimasonry";
-
-  import Card from "./Card.svelte";
-  import { displayedFiles, loadColor, sort, Sort } from "./store";
+  import { tick } from "svelte";
+  import Grid from "./Grid.svelte";
+  import { sort, Sort } from "./store";
   export let createNewNote: () => void;
-
-  let grid: MiniMasonry;
-  let cardsContainer: HTMLElement;  
+  export let onDragStart;
+  export let onDragOver;
+  export let onDrop;
 
   let selectedSort: Sort = Sort.ModifiedDesc;
   sort.subscribe(value => selectedSort = value);
   
-  const handleSortChange = () => {
+  const handleSortChange = async () => {
     sort.set(selectedSort);
+    // Trigger grid layout update after sorting change
+    if (gridRef?.updateLayoutNextTick) {
+      await gridRef.updateLayoutNextTick();
+    }
   };
 
-  const FACTOR = 1.5;
-  const MIN_CARD_SIZE = 150;
-
-  let cardWidth = 300;
-  let cardHeight = 300;
-
-  const getMaxCardSize = () => {
-    const containerWidth = cardsContainer.clientWidth;
-    return containerWidth - 20;
-  };
-
-  const recreateGrid = async () => {
-    grid.destroy();
-    grid = new MiniMasonry({
-      container: cardsContainer,
-      baseWidth: cardWidth,
-      gutter: 20,
-      surroundingGutter: false,
-      ultimateGutter: 20,
-      wedge: true,
-    });
-    await tick();
-    grid.layout();
-  };
-
+  let gridRef: typeof Grid;
   const increaseCardSize = async () => {
-    const maxCardSize = getMaxCardSize();
-    if (cardWidth * FACTOR <= maxCardSize && cardHeight * FACTOR <= maxCardSize) {
-      cardWidth *= FACTOR;
-      cardHeight *= FACTOR;
-      await recreateGrid();
-    }
+    if (gridRef) await gridRef.increaseCardSize();
   };
-
   const decreaseCardSize = async () => {
-    if (cardWidth > MIN_CARD_SIZE && cardHeight > MIN_CARD_SIZE) {
-      cardWidth /= FACTOR;
-      cardHeight /= FACTOR;
-      await recreateGrid();
-    }
+    if (gridRef) await gridRef.decreaseCardSize();
   };
 
-  onMount(() => {
-    grid = new MiniMasonry({
-      container: cardsContainer,
-      baseWidth: cardWidth,
-      gutter: 20,
-      surroundingGutter: false,
-      ultimateGutter: 20,
-      wedge: true,
-    });
-    grid.layout();
-
-    return () => {
-      grid.destroy();
-    };
-  });
-
-  let lastLayout: Date = new Date();
-  let pendingLayout: NodeJS.Timeout | null = null;
-  export const debouncedLayout = () => {
-    return new Promise<void>((resolve) => {
-      if (
-        lastLayout.getTime() + 100 > new Date().getTime() &&
-        pendingLayout === null
-      ) {
-        pendingLayout = setTimeout(
-          () => {
-            grid.layout();
-            lastLayout = new Date();
-            pendingLayout = null;
-            resolve();
-          },
-          lastLayout.getTime() + 100 - new Date().getTime(),
-        );
-        return;
-      }
-
-      grid.layout();
-      lastLayout = new Date();
-      resolve();
-    });
-  };
-  export const updateLayoutNextTick = async () => {
-    await tick();
-    return await debouncedLayout();
-  };
-  displayedFiles.subscribe(updateLayoutNextTick);
-
-  export let onDragStart;
-  export let onDragOver;
-  export let onDrop;
-  
-
+  // Forward updateLayoutNextTick to Grid to ensure it still works.
+  export function updateLayoutNextTick() {
+    return gridRef?.updateLayoutNextTick();
+  }
 </script>
 
 <div class="view-container">
@@ -130,11 +50,7 @@
       <button class="size-button decrease" onclick={decreaseCardSize} title="Decrease size">-</button>
     </div>
   </div>
-  <div class="cards-container" bind:this={cardsContainer}>
-    {#each $displayedFiles as file (file.path)}
-      <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} {onDragStart} {onDragOver} {onDrop} {cardWidth} {cardHeight} />
-    {/each}
-  </div>
+  <Grid bind:this={gridRef} {onDragStart} {onDragOver} {onDrop} />
 </div>
 
 <style>
@@ -190,15 +106,5 @@
     padding: 0 5px;
     background-color: var(--background-primary);
     color: var(--text-normal);
-  }
-  .cards-container {
-    position: relative;
-    container-type: inline-size;
-    padding-top: 70px;
-  }
-
-  .cards-container :global(*) {
-    --card-padding: var(--size-4-3);
-    --card-gutter: var(--size-4-5);
   }
 </style>
