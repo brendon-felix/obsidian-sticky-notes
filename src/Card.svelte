@@ -221,24 +221,26 @@
   {:else}
     <div class="read-view" bind:this={contentDiv}></div>
   {/if}
-  <div class="card-menu" class:visible={isHoveringTop && !isEditing}>
-    <div class="color-picker">
-      {#each colors as colorOption}
-        <button
-          class="color-option"
-          style="background-color: {colorOption};"
-          onclick={() => changeColor(colorOption)}
-          onkeydown={(e) => e.key === 'Enter' && changeColor(colorOption)}
-          aria-label="Change color to {colorOption}"
-        ></button>
-      {/each}
+  <div class="card-menu-wrapper" class:visible={isHoveringTop && !isEditing} style="border-color: {selectedColor};">
+    <div class="card-menu">
+      <div class="color-picker">
+        {#each colors as colorOption}
+          <button
+            class="color-option"
+            style="background-color: {colorOption};"
+            onclick={() => changeColor(colorOption)}
+            onkeydown={(e) => e.key === 'Enter' && changeColor(colorOption)}
+            aria-label="Change color to {colorOption}"
+          ></button>
+        {/each}
+      </div>
+      <button
+        class="clickable-icon"
+        use:trashIcon
+        onclick={trashFile}
+        aria-label="Delete file"
+      ></button>
     </div>
-    <button
-      class="clickable-icon"
-      use:trashIcon
-      onclick={trashFile}
-      aria-label="Delete file"
-    ></button>
   </div>
 </div>
 
@@ -327,7 +329,7 @@
     border-color: var(--border-color-hover);
   }
 
-  .card:hover .card-menu {
+  .card:hover .card-menu-wrapper {
     display: flex;
   }
 
@@ -335,7 +337,7 @@
     word-wrap: break-word;
   }
 
-  .card .card-menu {
+  .card-menu-wrapper {
     position: absolute;
     top: -30px;
     left: 0;
@@ -347,11 +349,19 @@
     justify-content: space-between;
     padding: 0 10px;
     border-bottom: 1px solid var(--background-modifier-border);
+    border-top: 0px solid var(--background-modifier-border); /* Extend the top border */
     transition: top 0.2s ease-in-out;
   }
 
-  .card .card-menu.visible {
+  .card-menu-wrapper.visible {
     top: 0;
+  }
+
+  .card-menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .color-picker {
