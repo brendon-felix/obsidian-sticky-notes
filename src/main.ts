@@ -32,6 +32,9 @@
 // FIX: Dragging and dropping quickly is not reliable
 // FIX: With big card size, zooming in makes the card size too big
 
+// REFACTOR: Split up svelte objects since they are getting too big (especially card.svelte)
+// REFACTOR: Place settings code in it's own src file
+
 import {
 	App,
 	Plugin,
