@@ -68,8 +68,9 @@ export default class StickyNotesPlugin extends Plugin {
 		this.addCommand({
 			id: 'create-new-sticky-note',
 			name: 'Create new sticky note',
-			callback: () => {
-				this.create_new_sticky_note();
+			callback: async () => {
+				await this.activateView();
+				await this.create_new_sticky_note(true);
 			}
 		});
 
