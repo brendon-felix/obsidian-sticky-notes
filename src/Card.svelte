@@ -19,9 +19,11 @@
     onDragStart: (event: DragEvent, path: string) => void;
     onDragOver: (event: DragEvent, path: string) => void;
     onDrop: (event: DragEvent, path: string) => void;
+    cardWidth: number;
+    cardHeight: number;
   }
 
-  let { file, updateLayoutNextTick, color, onDragStart, onDragOver, onDrop }: Props = $props();
+  let { file, updateLayoutNextTick, color, onDragStart, onDragOver, onDrop, cardWidth, cardHeight }: Props = $props();
 
   let contentDiv: HTMLElement | null = $state(null);
   let translateTransition: boolean = $state(false);
@@ -206,7 +208,7 @@
   role="link"
   onkeydown={handleCardKeyPress}
   tabindex="0"
-  style="border-color: {selectedColor};"
+  style="border-color: {selectedColor}; width: {cardWidth}px; height: {cardHeight}px;"
   onmousemove={handleMouseMove}
   onmouseleave={handleMouseLeave}
   ondragstart={(event) => onDragStart(event, file.path)}
@@ -250,8 +252,7 @@
     word-wrap: break-word;
     overflow-y: hidden;
     margin: 0;
-    width: 300px;
-    height: 250px;
+    /* width and height are now dynamic */
   }
   
   .card.transition {
