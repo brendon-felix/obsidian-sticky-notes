@@ -77,6 +77,8 @@
     await file.vault.trash(file, true);
     manualOrder.update(order => order.filter(path => path !== file.path));
     saveManualOrder();
+    await tick();
+    window.dispatchEvent(new Event("resize"));
     await updateLayoutNextTick();
   };
 
@@ -187,6 +189,11 @@
 
   onDestroy(() => {
     document.removeEventListener("keydown", handleKeyDown);
+  });
+
+  // Add re-layout on card destroy to update the grid after a card is removed.
+  onDestroy(() => {
+    updateLayoutNextTick();
   });
 
 </script>
