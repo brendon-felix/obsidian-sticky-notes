@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { tick } from "svelte";
   import Grid from "./Grid.svelte";
   import { sort, Sort } from "./store";
   export let createNewNote: () => void;
@@ -12,7 +11,6 @@
   
   const handleSortChange = async () => {
     sort.set(selectedSort);
-    // Trigger grid layout update after sorting change
     if (gridRef?.updateLayoutNextTick) {
       await gridRef.updateLayoutNextTick();
     }
@@ -26,7 +24,6 @@
     if (gridRef) await gridRef.decreaseCardSize();
   };
 
-  // Forward updateLayoutNextTick to Grid to ensure it still works.
   export function updateLayoutNextTick() {
     return gridRef?.updateLayoutNextTick();
   }

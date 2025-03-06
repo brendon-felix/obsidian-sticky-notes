@@ -80,7 +80,6 @@
 </div>
 
 <style>
-  /* ...existing .cards-container and card styles... */
   .cards-container {
     position: relative;
     container-type: inline-size;
@@ -90,5 +89,4 @@
     --card-padding: var(--size-4-3);
     --card-gutter: var(--size-4-5);
   }
-  /* ...other styles as needed... */
 </style>
