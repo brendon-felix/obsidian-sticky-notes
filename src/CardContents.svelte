@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { TFile } from "obsidian";
 	import { onMount, tick, onDestroy } from "svelte";
-	import { MarkdownPreviewRenderer, MarkdownRenderer } from "obsidian";
+	import { MarkdownPreviewRenderer, MarkdownRenderer, MarkdownEditView, MarkdownView } from "obsidian";
 	import { extractColorFromFrontmatter, newStickyNote, app, view } from "./store";
 	import { get } from "svelte/store";
 	
@@ -19,7 +19,7 @@
 	function postProcessor(element: HTMLElement, context: any) {
 		if (context.sourcePath !== file.path) return;
 		if (element.children.length === 0) return;
-        // Do other logic (remove blocks or whatever)
+				// Do other logic (remove blocks or whatever)
 	}
 	
 	const renderFile = async (el: HTMLElement): Promise<void> => {
@@ -109,9 +109,9 @@
 	});
 </script>
 
-<div class="card-contents" role="button" tabindex="0" on:click={handleCardClick} on:keydown={handleKeyDown}>
+<div class="card-contents" role="button" tabindex="0" onclick={handleCardClick} onkeydown={handleKeyDown}>
 	{#if isEditing}
-		<textarea bind:this={textareaEl} bind:value={editorContent} on:focusout={() => { if (!isClosing && !closedByEscape) closeEditor(true); }} on:keydown={handleTextareaKeydown}></textarea>
+		<textarea bind:this={textareaEl} bind:value={editorContent} onfocusout={() => { if (!isClosing && !closedByEscape) closeEditor(true); }} onkeydown={handleTextareaKeydown}></textarea>
 	{:else}
 		<div class="read-view" bind:this={contentDiv}></div>
 	{/if}
@@ -120,10 +120,30 @@
 <style>
 	.card-contents {
 		width: 100%;
-        height: 100%;
+		height: 100%;
 	}
 	.read-view {
 		padding: var(--card-padding);
+	}
+	.read-view :global(ul) {
+		padding-left: var(--size-4-5);
+	}
+	.read-view :global(pre) {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+	.read-view :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	.read-view :global(th),
+	.read-view :global(td) {
+		border: 1px solid var(--background-modifier-border);
+		padding: 4px 8px;
+	}
+	.read-view :global(th) {
+		background-color: var(--background-secondary);
+		font-weight: bold;
 	}
 	textarea {
 		width: 100%;
@@ -136,3 +156,4 @@
 		color: var(--text-normal);
 	}
 </style>
+
