@@ -255,7 +255,7 @@
 	.card.selected {		
 		border-width: 3px;
 		border-top-width: 0px;
-		background-color: var(--background-primary);
+		background-color: var(--background-secondary);
 	}
 
 	.card:hover {
@@ -373,8 +373,9 @@
 		padding-top: calc(var(--card-padding) + 14px);
 		font-size: 0.9rem;
 		/* background-color: var(--background-primary-alt); */
-		background-color: var(--background-primary);
+		background-color: var(--background-secondary);
 		color: var(--text-normal);
+		border-radius: 2px;
 	}
 	/* textarea:focus {
 		padding: calc(var(--card-padding) - 1px);

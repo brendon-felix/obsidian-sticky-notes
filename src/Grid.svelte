@@ -62,6 +62,7 @@
       baseWidth: cardWidth,
       gutter: 20,
       minify: false,
+      surroundingGutter: false,
       ultimateGutter: 20,
     });
     grid.layout();
