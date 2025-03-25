@@ -343,6 +343,9 @@
 	.read-view :global(ul) {
 		padding-left: var(--size-4-5);
 	}
+	.read-view :global(ol) {
+		padding-left: var(--size-4-5); /* Added this line */
+	}
 	.read-view :global(pre) {
 		white-space: pre-wrap;
 		word-wrap: break-word;
