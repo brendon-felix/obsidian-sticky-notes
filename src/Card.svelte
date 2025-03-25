@@ -37,7 +37,6 @@
 		"#C78EFF" /*violet*/,
 		"#EA86C2" /*pink*/,
 		"#FF7F50" /*coral*/,
-		// "#DDA0DD" /*plum*/,
 		"#AAAAAA" /*gray*/,
 		// "#454545" /*darkgray*/,
 	];
