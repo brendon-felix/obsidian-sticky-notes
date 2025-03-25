@@ -27,9 +27,8 @@
       container: cardsContainer,
       baseWidth: cardWidth,
       gutter: 20,
-      surroundingGutter: false,
+      minify: false,
       ultimateGutter: 20,
-      wedge: true,
     });
     await tick();
     grid.layout();
@@ -62,9 +61,8 @@
       container: cardsContainer,
       baseWidth: cardWidth,
       gutter: 20,
-      surroundingGutter: false,
+      minify: false,
       ultimateGutter: 20,
-      wedge: true,
     });
     grid.layout();
     return () => {
@@ -75,21 +73,28 @@
 
 <div class="cards-container" bind:this={cardsContainer}>
   {#each $displayedFiles as file (file.path)}
-    <Card {file} {updateLayoutNextTick} color={loadColor(file.path)} {onDragStart} {onDragOver} {onDrop} {cardWidth} {cardHeight} />
+    <Card
+      {file}
+      {updateLayoutNextTick}
+      color={loadColor(file.path)}
+      {onDragStart}
+      {onDragOver}
+      {onDrop}
+      {cardWidth}
+      {cardHeight}
+    />
   {/each}
 </div>
 
 <style>
-  /* ...existing .cards-container and card styles... */
   .cards-container {
     position: relative;
-    /* container-type: inline-size; */
+    container-type: inline-size;
     padding-top: 70px;
-    border: 1px solid red;
+    /* border: 1px solid red; */
   }
   .cards-container :global(*) {
     --card-padding: var(--size-4-3);
     --card-gutter: var(--size-4-5);
   }
-  /* ...other styles as needed... */
 </style>

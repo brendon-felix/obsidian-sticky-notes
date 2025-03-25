@@ -184,7 +184,7 @@
 	class:transition={translateTransition}
 	class:selected={isSelected}
 	transition:blur
-	style="border-color: {selectedColor}; width: {cardWidth}px; height: {cardHeight}px;"
+	style="border-color: {selectedColor}; height: {isSelected ? cardHeight + 2 : cardHeight}px;"
 	onmousemove={handleMouseMove}
 	onmouseleave={handleMouseLeave}
 	ondragstart={(event) => onDragStart(event, file.path)}
