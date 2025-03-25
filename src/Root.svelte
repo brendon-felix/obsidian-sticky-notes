@@ -1,7 +1,7 @@
 <script lang="ts">
   import { get } from "svelte/store";
   import Grid from "./Grid.svelte";
-  import { sort, Sort, files, manualOrder, saveManualOrder } from "./store";
+  import { sort, Sort, files, manualOrder, saveManualOrder, colorMap } from "./store";
   export let createNewNote: () => void;
   export let onDragStart;
   export let onDragOver;
@@ -25,6 +25,12 @@
         sortedList.sort((a, b) => b.stat.ctime - a.stat.ctime);
       } else if (selectedSort === Sort.CreatedAsc) {
         sortedList.sort((a, b) => a.stat.ctime - b.stat.ctime);
+      } else if (selectedSort === Sort.Color) {
+        sortedList.sort((a, b) => {
+          const colorA = get(colorMap)[a.name] || "";
+          const colorB = get(colorMap)[b.name] || "";
+          return colorA.localeCompare(colorB);
+        });
       }
       const newOrder = sortedList.map(file => file.name);
       manualOrder.set(newOrder);
@@ -57,6 +63,7 @@
       <option value={Sort.ModifiedAsc}>Modified time (old to new)</option>
       <option value={Sort.CreatedDesc}>Created time (new to old)</option>
       <option value={Sort.CreatedAsc}>Created time (old to new)</option>
+      <option value={Sort.Color}>Color</option>
       <option value={Sort.Manual}>Manual</option>
     </select>
     <div class="size-controls">

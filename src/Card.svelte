@@ -120,14 +120,13 @@
 			});
 		} else {
 			isSelected = true;
-			newStickyNote.set(file.path);
-			translateTransition = false;
+			// newStickyNote.set(file.path);
+			// translateTransition = false;
 			updateLayoutNextTick();
 		}
 	};
 	
 	const handleKeyDown = async (event: KeyboardEvent) => {
-		event.preventDefault();
 		if (event.key === "Escape" && isSelected) {
 			if(isSelected) {
 				if(isEditing) {
@@ -197,9 +196,12 @@
 	ondragover={(event) => onDragOver(event, file.path)}
 	ondrop={handleDrop}
 	draggable={!isEditing}
-	role="group"
+	role="button"
+	onclick={handleCardClick}
+	onkeydown={handleKeyDown}
+	tabindex="0"
 >
-	<div class="card-contents" role="button" tabindex="0" onclick={handleCardClick} onkeydown={handleKeyDown}>
+	<div class="card-contents" class:selected={isSelected}>
 		{#if isEditing}
 			<textarea bind:this={textareaEl} bind:value={editorContent} onfocusout={() => { if (!isClosing && !closedByEscape) closeEditor(true); }} onkeydown={handleTextareaKeydown}></textarea>
 		{:else}
@@ -212,6 +214,7 @@
 				{#each colors as colorOption}
 					<button
 						class="color-option"
+						class:selected={colorOption === selectedColor}
 						style="background-color: {colorOption};"
 						onclick={() => changeColor(colorOption)}
 						onkeydown={(e) => e.key === 'Enter' && changeColor(colorOption)}
@@ -234,7 +237,7 @@
 		position: absolute;
 		background-color: var(--background-primary-alt);
 		border: 1px solid var(--background-modifier-border);
-		border-top-width: 5px;
+		border-top-width: 0;
 		padding: 0;
 		word-wrap: break-word;
 		overflow-y: hidden;
@@ -263,18 +266,19 @@
 
 	.card-menu-wrapper {
 		position: absolute;
-		top: -30px;
+		top: -35px;
+		height: 40px;
 		left: 0;
 		right: 0;
-		height: 30px;
 		/* background-color: var(--background-primary); */
 		display: flex;
-		align-items: center;
+		/* align-items: center; */
 		justify-content: space-between;
-		padding: 0 10px;
-		border-bottom: 1px solid var(--background-modifier-border);
+		/* padding: 5px; */
+		/* padding: 0 10px; */
+		/* border-bottom: 1px solid var(--background-modifier-border); */
 		/* border-top: 0px solid var(--background-modifier-border); */
-		border-top: none;
+		/* border-top: none; */
 		transition: top 0.1s ease-in-out;
 	}
 
@@ -283,32 +287,49 @@
 	}
 
 	.card-menu {
+		padding: 5px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		width: 100%;
+		height: 100%;
 	}
 
 	.color-picker {
 		display: flex;
 		gap: 0px;
+		/* height: 100%; */
+		/* background-color: var(--background-primary-alt); */
+		/* border: 1px solid var(--background-modifier-border); */
 	}
 
 	.color-option {
-		/* width: 20px; */
-		height: 100%;
+		width: 20px;
+		height: 30px;
+		/* height: 100%; */
 		cursor: pointer;
 		border-radius: 0px;
+		border: none;
 		box-shadow: none;
+	}
+
+	.color-option.selected {
+		border: 0px solid var(--background-modifier-border);
 	}
 
 	.clickable-icon {
 		cursor: pointer;
+		color: var(--text-normal);
+		/* background-color: var(--background-modifier-hover); */
+		background-color: var(--background-modifier-border);
 	}
 
 	.card-contents {
 		width: 100%;
 		height: 100%;
+	}
+	.card-contents.selected {
+		border: 1px solid var(selectedColor);
 	}
 	.read-view {
 		padding: var(--card-padding);

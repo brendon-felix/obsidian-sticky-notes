@@ -13,6 +13,7 @@ export enum Sort {
 	ModifiedAsc = "modifiedAsc",     // old to new
 	CreatedDesc = "createdDesc",     // new to old
 	CreatedAsc = "createdAsc",       // old to new
+	Color = "color",
 	Manual = "manual",
 }
 
@@ -27,16 +28,16 @@ sort.subscribe(value => {
 	localStorage.setItem('stickyNotesSort', JSON.stringify(value));
 });
 
-export const colorMap: Record<string, string> = {};
+export const colorMap = writable<Record<string, string>>({});
 
 export const saveColorMap = () => {
-    localStorage.setItem('stickyNotesColorMap', JSON.stringify(colorMap));
+    localStorage.setItem('stickyNotesColorMap', JSON.stringify(get(colorMap)));
 };
 
 export const loadColorMap = () => {
     const savedColorMap = localStorage.getItem('stickyNotesColorMap');
     if (savedColorMap) {
-        Object.assign(colorMap, JSON.parse(savedColorMap));
+        colorMap.set(JSON.parse(savedColorMap));
     }
 };
 
@@ -66,7 +67,9 @@ export const saveColor = async (filePath: string, color: string) => {
 		console.log("Setting color in frontmatter is not implemented yet.");
     } else {
         if (fileName) {
-            colorMap[fileName] = color;
+            const currentColorMap = get(colorMap);
+            currentColorMap[fileName] = color;
+            colorMap.set(currentColorMap);
             saveColorMap();
         }
 	}
@@ -74,7 +77,8 @@ export const saveColor = async (filePath: string, color: string) => {
 
 export const loadColor = (filePath: string): string | undefined => {
     const fileName = filePath.split('/').pop();
-    return fileName ? colorMap[fileName] : undefined;
+    const currentColorMap = get(colorMap);
+    return fileName ? currentColorMap[fileName] : undefined;
 };
 
 export const extractColorFromFrontmatter = async (file: TFile): Promise<string | undefined> => {
@@ -109,8 +113,8 @@ console.log("store calling loadManualOrder()");
 loadManualOrder();
 
 const sortedFiles = derived(
-	[files, sort, manualOrder],
-	([$files, $sort, $manualOrder]) => {
+	[files, sort, manualOrder, colorMap],
+	([$files, $sort, $manualOrder, $colorMap]) => {
 		if ($sort === Sort.Manual && $manualOrder.length > 0) {
 			const orderedFiles = $manualOrder
 				 .map(name => $files.find(file => file.name === name))
@@ -125,6 +129,12 @@ const sortedFiles = derived(
 			return $files.slice().sort((a, b) => b.stat.ctime - a.stat.ctime);
 		} else if ($sort === Sort.CreatedAsc) {
 			return $files.slice().sort((a, b) => a.stat.ctime - b.stat.ctime);
+		} else if ($sort === Sort.Color) {
+			return $files.slice().sort((a, b) => {
+				const colorA = $colorMap[a.name] || "";
+				const colorB = $colorMap[b.name] || "";
+				return colorA.localeCompare(colorB);
+			});
 		}
 		return $files;
 	},

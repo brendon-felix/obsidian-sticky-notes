@@ -38,6 +38,12 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 			sortedList.sort((a, b) => b.stat.ctime - a.stat.ctime);
 		} else if (currentSort === Sort.CreatedAsc) {
 			sortedList.sort((a, b) => a.stat.ctime - b.stat.ctime);
+		} else if (currentSort === Sort.Color) {
+			sortedList.sort((a, b) => {
+				const colorA = get(store.colorMap)[a.name] || "";
+				const colorB = get(store.colorMap)[b.name] || "";
+				return colorA.localeCompare(colorB);
+			});
 		}
 		newOrder = sortedList.map(file => file.name);
 	} else {
