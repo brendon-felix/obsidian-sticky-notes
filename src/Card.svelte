@@ -248,8 +248,8 @@
 	}
 
 	.card.selected {		
-		/* border-width: 5px; */
-		/* border-top-width: 0px; */
+		border-width: 3px;
+		border-top-width: 0px;
 		background-color: var(--background-primary);
 	}
 
@@ -331,6 +331,7 @@
 	}
 	.read-view.selected {
 		overflow-y: auto;
+		padding: calc(var(--card-padding) - 1px);
 		border: 0px solid var(--background-modifier-border);
 	}
 	.read-view :global(ul) {
@@ -358,11 +359,16 @@
 		height: 100%;
 		border: none;
 		resize: none;
-		padding: var(--card-padding);
+		/* padding: var(--card-padding); */
+		padding: calc(var(--card-padding) - 1px);
+		padding-top: calc(var(--card-padding) + 12px);
 		font-size: 0.9rem;
 		/* background-color: var(--background-primary-alt); */
 		background-color: var(--background-primary);
 		color: var(--text-normal);
 	}
+	/* textarea:focus {
+		padding: calc(var(--card-padding) - 1px);
+	} */
 
 </style>
