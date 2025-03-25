@@ -31,12 +31,15 @@
 	// let closedByEscape: boolean = $state(false);
 	
 	const colors = [
-		"#FFD700" /*gold*/,
+		"#E6B905" /*gold*/,
+		"#6FD262" /*lightgreen*/,
+		"#5AC0E7" /*skyblue*/,
+		"#C78EFF" /*violet*/,
+		"#EA86C2" /*pink*/,
 		"#FF7F50" /*coral*/,
-		"#90EE90" /*lightgreen*/,
-		"#87CEEB" /*skyblue*/,
-		"#DDA0DD" /*plum*/,
-		"#808080" /*gray*/,
+		// "#DDA0DD" /*plum*/,
+		"#AAAAAA" /*gray*/,
+		// "#454545" /*darkgray*/,
 	];
 	
 	const changeColor = async (newColor: string) => {
@@ -121,7 +124,7 @@
 				}
 			});
 		}
-		updateLayoutNextTick(); // remove this
+		updateLayoutNextTick();
 	};
 	
 	const handleKeyDown = async (event: KeyboardEvent) => {
@@ -132,7 +135,7 @@
 			} else {
 				isSelected = false;
 			}
-			updateLayoutNextTick(); // remove this
+			updateLayoutNextTick();
 		}
 	};
 	
@@ -255,6 +258,7 @@
 	.card.selected {		
 		border-width: 3px;
 		border-top-width: 0px;
+		border-color: var(--background-modifier-border);
 		background-color: var(--background-secondary);
 	}
 
@@ -305,7 +309,7 @@
 
 	.color-option {
 		width: 20px;
-		height: 30px;
+		/* height: 30px; */
 		/* height: 100%; */
 		cursor: pointer;
 		border-radius: 0px;
