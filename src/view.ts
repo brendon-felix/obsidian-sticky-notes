@@ -51,10 +51,13 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 	}
 	const draggedIndex = newOrder.indexOf(draggedItem!);
 	const targetIndex = targetName ? newOrder.indexOf(targetName) : -1;
-	console.log(`Dropped ${draggedItem} (index ${draggedIndex}) on ${targetName} (index ${targetIndex})`);
+	// console.log(`Dropped ${draggedItem} (index ${draggedIndex}) on ${targetName} (index ${targetIndex})`);
 	if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-		newOrder.splice(draggedIndex, 1);
-		newOrder.splice(targetIndex, 0, draggedItem!);
+		// newOrder.splice(draggedIndex, 1);
+		// newOrder.splice(targetIndex, 0, draggedItem!);
+		const temp = newOrder[draggedIndex];
+		newOrder[draggedIndex] = newOrder[targetIndex];
+		newOrder[targetIndex] = temp;
 		manualOrder.set(newOrder);
 		saveManualOrder();
 		// Switch to manual sort so the moved card stays in place.

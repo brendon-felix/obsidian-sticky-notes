@@ -30,7 +30,14 @@
 	// let isClosing: boolean = $state(false);
 	// let closedByEscape: boolean = $state(false);
 	
-	const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD", "#808080"];
+	const colors = [
+		"#FFD700" /*gold*/,
+		"#FF7F50" /*coral*/,
+		"#90EE90" /*lightgreen*/,
+		"#87CEEB" /*skyblue*/,
+		"#DDA0DD" /*plum*/,
+		"#808080" /*gray*/,
+	];
 	
 	const changeColor = async (newColor: string) => {
 		selectedColor = newColor;

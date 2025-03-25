@@ -83,8 +83,9 @@
   /* ...existing .cards-container and card styles... */
   .cards-container {
     position: relative;
-    container-type: inline-size;
+    /* container-type: inline-size; */
     padding-top: 70px;
+    border: 1px solid red;
   }
   .cards-container :global(*) {
     --card-padding: var(--size-4-3);
