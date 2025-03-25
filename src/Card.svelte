@@ -121,6 +121,7 @@
 				}
 			});
 		}
+		updateLayoutNextTick(); // remove this
 	};
 	
 	const handleKeyDown = async (event: KeyboardEvent) => {
@@ -131,6 +132,7 @@
 			} else {
 				isSelected = false;
 			}
+			updateLayoutNextTick(); // remove this
 		}
 	};
 	
