@@ -23,6 +23,8 @@
 // TODO: Emphasize the current color selected in color selection
 //   TODO: shift/translate outline for emphasis to show swtich in color
 
+// FIX: Make sure only one card can be selected at a time
+//   TODO: Support shift-click and ctrl-click for multiple selection
 // FIX: Reset colors command doesn't take effect until reloading
 // FIX: Make card size peristent across re-open and reload
 // FIX: Support ribbon menu while editing (just shift text area instead of covering it)
