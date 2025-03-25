@@ -51,6 +51,7 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 	}
 	const draggedIndex = newOrder.indexOf(draggedItem!);
 	const targetIndex = targetName ? newOrder.indexOf(targetName) : -1;
+	console.log(`Dropped ${draggedItem} (index ${draggedIndex}) on ${targetName} (index ${targetIndex})`);
 	if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
 		newOrder.splice(draggedIndex, 1);
 		newOrder.splice(targetIndex, 0, draggedItem!);

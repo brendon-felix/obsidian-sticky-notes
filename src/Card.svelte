@@ -229,7 +229,7 @@
 	.card {
 		position: absolute;
 		background-color: var(--background-primary-alt);
-		border: 2px solid var(--background-modifier-border);
+		border: 1px solid var(--background-modifier-border);
 		border-top-width: 0;
 		padding: 0;
 		word-wrap: break-word;
@@ -327,7 +327,8 @@
 	}
 	.read-view.selected {
 		overflow-y: auto;
-		padding: calc(var(--card-padding) - 1px);
+		padding: calc(var(--card-padding) - 2px);
+		padding-top: var(--card-padding);
 		border: 0px solid var(--background-modifier-border);
 	}
 	.read-view :global(ul) {
@@ -356,8 +357,8 @@
 		border: none;
 		resize: none;
 		/* padding: var(--card-padding); */
-		padding: calc(var(--card-padding) - 1px);
-		padding-top: calc(var(--card-padding) + 12px);
+		padding: calc(var(--card-padding) - 2px);
+		padding-top: calc(var(--card-padding) + 14px);
 		font-size: 0.9rem;
 		/* background-color: var(--background-primary-alt); */
 		background-color: var(--background-primary);
