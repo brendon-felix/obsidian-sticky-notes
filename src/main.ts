@@ -1,10 +1,11 @@
+// TODO: Finish implementing default color setting
+//   TODO: Make default color setting take effect on new notes
 // TODO: When newly created note is not at the beginning, scroll to it
 // TODO: Add command or menu option to remove color mapping and/or manual ordering
 //   TODO: Remove all local storage data when uninstalling
 // TODO: Find better way to cut off text for efficiency (variable card size means this is not simple)
 // TODO: Add option to sort notes by color
 // TODO: On card hover, indicate it is clickable (modify background and/or border color)
-// TODO: Make drop ribbon menu better looking (extend top border downwards)
 // TODO: Emphasize the current note being edited
 // TODO: Add command to delete current sticky note
 // TODO: Suport selecting multiple notes to delete or change color or move positions
@@ -16,24 +17,24 @@
 //   TODO: Add support for Ctrl+Z and Ctrl+Y
 // TODO: Add a search bar
 // TODO: Add right-click menu
+//   TODO: Add option to delete note
 //   TODO: Add option to open notes in same tab, new tab, new window, new pane, etc.
 // TODO: Add drag and drop functionality to trash notes
 // TODO: Emphasize the current color selected in color selection
 //   TODO: shift/translate outline for emphasis to show swtich in color
 
+// FIX: Reset colors command doesn't take effect until reloading
 // FIX: Make card size peristent across re-open and reload
 // FIX: Support ribbon menu while editing (just shift text area instead of covering it)
-// FIX: Remove rounded corners from editable textarea
 // FIX: Text is often blurry while editing a sticky note
 // FIX: Changing folder path setting leads to odd behavior
 // FIX: Layout is updated in the background while view port is 0 x 0
 // 		which causes invalid layouts (all stacked on top of each other)
 // FIX: Finishing implementing set frontmatter color property
-// FIX: Dragging and dropping quickly is not reliable
 // FIX: With big card size, zooming in makes the card size too big
 
-// REFACTOR: Split up svelte objects since they are getting too big (especially card.svelte)
 // REFACTOR: Place settings code in it's own src file
+// REFACTOR: Place svelte components in their own folder
 
 import {
 	App,
@@ -64,13 +65,13 @@ const colors: { [key: string]: string } = {
 export interface StickyNotesSettings {
 	sticky_notes_folder: string;
 	set_color_in_frontmatter: boolean;
-	default_note_color: string; // Add this line
+	// default_note_color: string;
 }
 
 export const DEFAULT_SETTINGS: StickyNotesSettings = {
 	sticky_notes_folder: "",
 	set_color_in_frontmatter: false,
-	default_note_color: "Yellow", // Change to color name
+	// default_note_color: "Yellow"
 }
 
 export default class StickyNotesPlugin extends Plugin {
@@ -169,7 +170,7 @@ export default class StickyNotesPlugin extends Plugin {
 
 	async resetAllStickyNotesColors() {
 		// const defaultColor = colors[this.settings.default_note_color];
-		const defaultColor = colors["Yellow"];
+		const defaultColor = colors["Gray"];
 		colorMap.update(currentColorMap => {
 			for (const key in currentColorMap) {
 				currentColorMap[key] = defaultColor;
@@ -227,7 +228,7 @@ class StickyNotesSettingsTab extends PluginSettingTab {
 					});
 			});
 
-		const defaultColorStore = writable(this.plugin.settings.default_note_color);
+		// const defaultColorStore = writable(this.plugin.settings.default_note_color);
 
 		// new Setting(this.containerEl)
 		// 	.setName("Default note color")
