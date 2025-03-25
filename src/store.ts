@@ -47,6 +47,7 @@ export const saveColor = async (filePath: string, color: string) => {
     const fileName = filePath.split('/').pop();
     const currentSettings = get(settings);
     if (currentSettings.set_color_in_frontmatter) {
+        console.log("Setting color in frontmatter is not implemented yet.");
         // const file = get(app).vault.getAbstractFileByPath(filePath) as TFile;
         // if (file) {
         //     const content = await file.vault.read(file);
@@ -64,7 +65,6 @@ export const saveColor = async (filePath: string, color: string) => {
         //     }
         //     await file.vault.modify(file, newContent);
         // }
-		console.log("Setting color in frontmatter is not implemented yet.");
     } else {
         if (fileName) {
             const currentColorMap = get(colorMap);
@@ -92,24 +92,20 @@ export const extractColorFromFrontmatter = async (file: TFile): Promise<string |
 };
 
 export const manualOrder = writable<string[]>([]);
-export const manualOrderLoaded = writable(false); // new flag to indicate load complete
+export const manualOrderLoaded = writable(false);
 
 export const saveManualOrder = () => {
-    // console.log("saving manual order as:", get(manualOrder));
-    console.log("saving manual order");
 	localStorage.setItem('stickyNotesManualOrder', JSON.stringify(get(manualOrder)));
 };
 
 export const loadManualOrder = () => {
 	const savedOrder = localStorage.getItem('stickyNotesManualOrder');
 	if (savedOrder) {
-        console.log("loaded manual order");
 		manualOrder.set(JSON.parse(savedOrder));
 	}
-	manualOrderLoaded.set(true); // mark that manual order is loaded
+	manualOrderLoaded.set(true);
 };
 
-console.log("store calling loadManualOrder()");
 loadManualOrder();
 
 const sortedFiles = derived(
@@ -156,7 +152,6 @@ files.subscribe((fileList) => {
 	
 	// if (JSON.stringify(updatedOrder) !== JSON.stringify(currentOrder)) {
 	// 	manualOrder.set(updatedOrder);
-	// 	console.log("files subscription calling saveManualOrder()");
 	// 	saveManualOrder();
 	// }
 });

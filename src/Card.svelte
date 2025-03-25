@@ -31,16 +31,21 @@
 	let isEditing: boolean = $state(false);
 	let editorContent: string = $state("");
 	let textareaEl: HTMLTextAreaElement | null = $state(null);
-	let isClosing: boolean = $state(false);
-	let closedByEscape: boolean = $state(false);
+	// let isClosing: boolean = $state(false);
+	// let closedByEscape: boolean = $state(false);
 	
-	const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD"];
+	const colors = ["#FFD700", "#FF6347", "#90EE90", "#87CEEB", "#DDA0DD", "#808080"];
+	
+	const changeColor = async (newColor: string) => {
+		selectedColor = newColor;
+		await saveColor(file.name, newColor);
+		updateLayoutNextTick();
+	};
 
 	const trashFile = async (e: Event) => {
 		e.stopPropagation();
 		await file.vault.trash(file, true);
 		manualOrder.update(order => order.filter(path => path !== file.path));
-		console.log("trashFile() calling saveManualOrder()");
 		saveManualOrder();
 		await tick();
 		window.dispatchEvent(new Event("resize"));
@@ -49,11 +54,6 @@
 
 	const trashIcon = (element: HTMLElement) => setIcon(element, "trash");
 
-	const changeColor = async (newColor: string) => {
-		selectedColor = newColor;
-		await saveColor(file.name, newColor);
-		updateLayoutNextTick();
-	};
 
 	const handleMouseMove = (event: MouseEvent) => {
 		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -82,31 +82,30 @@
 		MarkdownPreviewRenderer.unregisterPostProcessor(postProcessor);
 	};
 	
-	const closeEditor = async (saveChanges: boolean = true) => {
-		if (isClosing) return;
-		isClosing = true;
+	const requestCloseEditor = async () => {
+		if (isEditing) {
+			await closeEditor();
+		}
+	};
+
+	const closeEditor = async () => {
+		isEditing = false;
+		// save contents
 		const originalContent = await file.vault.cachedRead(file);
 		if (editorContent !== originalContent) {
 			await file.vault.modify(file, editorContent);
 			await updateLayoutNextTick();
 		}
-		// if (saveChanges) {
-		// } else {
-		// 	editorContent = originalContent;
-		// }
-		isEditing = false;
-		// isSelected = false;
-		translateTransition = true;
 		await tick();
+		// render markdown
 		if (contentDiv !== null) await renderFile(contentDiv);
-		isClosing = false;
-		// reset the flag so that future focusouts can trigger closing if needed.
-		closedByEscape = false;
 	};
 	
 	const handleCardClick = (event: MouseEvent) => {
 		if ((event.target as HTMLElement).closest('.card-menu') || isEditing) return;
-		if (isSelected) {
+		if (!isSelected) {
+			isSelected = true;
+		} else {
 			isEditing = true;
 			tick().then(() => {
 				if (textareaEl) {
@@ -118,29 +117,22 @@
 					textareaEl.scrollTop = scrollTop;
 				}
 			});
-		} else {
-			isSelected = true;
-			// newStickyNote.set(file.path);
-			// translateTransition = false;
-			updateLayoutNextTick();
 		}
 	};
 	
 	const handleKeyDown = async (event: KeyboardEvent) => {
 		if (event.key === "Escape" && isSelected) {
-			if(isSelected) {
-				if(isEditing) {
-					closedByEscape = true;
-					await closeEditor(false);
-					translateTransition = true;
-				} else {
-					isSelected = false;
-				}
+			if(isEditing) {
+				await requestCloseEditor();
+				translateTransition = true;
+			} else {
+				isSelected = false;
 			}
 		}
 	};
 	
 	const handleTextareaKeydown = async (event: KeyboardEvent) => {
+		// make tab key insert tab character instead of moving focus
 		if (event.key === "Tab") {
 			event.preventDefault();
 			if (textareaEl) {
@@ -150,11 +142,11 @@
 				textareaEl.selectionStart = textareaEl.selectionEnd = start + 1;
 				editorContent = textareaEl.value;
 			}
+		// make escape key close editor
 		} else if (event.key === "Escape" && isEditing) {
-			event.preventDefault();
-			event.stopPropagation();
-			closedByEscape = true;
-			await closeEditor(true);
+			// event.preventDefault();
+			event.stopPropagation(); // prevents deselecting the card as well
+			await requestCloseEditor();
 		}
 	};
 
@@ -203,9 +195,14 @@
 >
 	<div class="card-contents" class:selected={isSelected}>
 		{#if isEditing}
-			<textarea bind:this={textareaEl} bind:value={editorContent} onfocusout={() => { if (!isClosing && !closedByEscape) closeEditor(true); }} onkeydown={handleTextareaKeydown}></textarea>
+			<textarea
+				bind:this={textareaEl}
+				bind:value={editorContent}
+				onfocusout={() => { requestCloseEditor() }}
+				onkeydown={handleTextareaKeydown}>
+			</textarea>
 		{:else}
-			<div class="read-view" bind:this={contentDiv}></div>
+			<div class="read-view" class:selected={isSelected} bind:this={contentDiv}></div>
 		{/if}
 	</div>
 	<div class="card-menu-wrapper" class:visible={isHoveringTop} style="background-color: {selectedColor};">
@@ -236,7 +233,7 @@
 	.card {
 		position: absolute;
 		background-color: var(--background-primary-alt);
-		border: 1px solid var(--background-modifier-border);
+		border: 2px solid var(--background-modifier-border);
 		border-top-width: 0;
 		padding: 0;
 		word-wrap: break-word;
@@ -251,8 +248,8 @@
 	}
 
 	.card.selected {		
-		/* border-width: 3px; */
-		/* border-top-width: 8px; */
+		/* border-width: 5px; */
+		/* border-top-width: 0px; */
 		background-color: var(--background-primary);
 	}
 
@@ -298,8 +295,6 @@
 	.color-picker {
 		display: flex;
 		gap: 0px;
-		/* height: 100%; */
-		/* background-color: var(--background-primary-alt); */
 		/* border: 1px solid var(--background-modifier-border); */
 	}
 
@@ -320,7 +315,6 @@
 	.clickable-icon {
 		cursor: pointer;
 		color: var(--text-normal);
-		/* background-color: var(--background-modifier-hover); */
 		background-color: var(--background-modifier-border);
 	}
 
@@ -329,10 +323,15 @@
 		height: 100%;
 	}
 	.card-contents.selected {
-		border: 1px solid var(selectedColor);
+		border: 0px solid var(--background-modifier-border);
 	}
 	.read-view {
 		padding: var(--card-padding);
+		height: 100%;
+	}
+	.read-view.selected {
+		overflow-y: auto;
+		border: 0px solid var(--background-modifier-border);
 	}
 	.read-view :global(ul) {
 		padding-left: var(--size-4-5);
@@ -361,7 +360,8 @@
 		resize: none;
 		padding: var(--card-padding);
 		font-size: 0.9rem;
-		background-color: var(--background-primary-alt);
+		/* background-color: var(--background-primary-alt); */
+		background-color: var(--background-primary);
 		color: var(--text-normal);
 	}
 

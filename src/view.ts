@@ -55,7 +55,6 @@ export const onDrop = (event: DragEvent, targetPath: string) => {
 		newOrder.splice(draggedIndex, 1);
 		newOrder.splice(targetIndex, 0, draggedItem!);
 		manualOrder.set(newOrder);
-		console.log("onDrop() calling saveManualOrder()");
 		saveManualOrder();
 		// Switch to manual sort so the moved card stays in place.
 		store.sort.set(Sort.Manual);
