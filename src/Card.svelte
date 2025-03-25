@@ -1,14 +1,10 @@
 <script lang="ts">
 	import type { TFile } from "obsidian";
-	import { setIcon, MarkdownPreviewRenderer, MarkdownRenderer, MarkdownEditView, MarkdownView } from "obsidian";
+	import { setIcon, MarkdownPreviewRenderer, MarkdownRenderer } from "obsidian";
 	import { onMount, tick, onDestroy } from "svelte";
 	import { blur } from "svelte/transition";
 	import { saveColor, extractColorFromFrontmatter, newStickyNote, app, view, manualOrder, saveManualOrder } from "./store";
-	// import CardContents from "./CardContents.svelte";
 	import { get } from "svelte/store";
-
-	// import type { TFile } from "obsidian";
-	// import { onMount, tick, onDestroy } from "svelte";
 
 	interface Props {
 		file: TFile;
