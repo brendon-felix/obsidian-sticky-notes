@@ -79,7 +79,7 @@
   .view-container {
     position: relative;
     /* background-color: var(--background-secondary); */
-    border: 2px solid red;
+    border: 1px solid red;
   }
   .controls {
     position: absolute;
