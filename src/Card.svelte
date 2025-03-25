@@ -20,7 +20,7 @@
 	let { file, updateLayoutNextTick, color, onDragStart, onDragOver, onDrop, cardWidth, cardHeight }: Props = $props();
 	
 	let translateTransition: boolean = $state(false);
-	let selectedColor: string = $state(color || "#FFD700");
+	let selectedColor: string = $state(color || "#E6B905");
 	let isHoveringTop: boolean = $state(false);
 	let contentDiv: HTMLElement | null = $state(null);
 	let isSelected: boolean = $state(false);

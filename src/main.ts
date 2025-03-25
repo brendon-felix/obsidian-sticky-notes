@@ -45,17 +45,32 @@ import {
 import { StickyNotesView, VIEW_TYPE } from "./view";
 import store, { loadColorMap, settings, newStickyNote, displayedCount } from "./store";
 import { manualOrder, saveManualOrder } from "./store";
+import { colorMap, saveColorMap } from "./store";
 
 import { FolderSuggest } from "./FolderSuggestor";
+import { writable, get } from "svelte/store";
+
+const colors: { [key: string]: string } = {
+	"Yellow": "#E6B905",
+	"Green": "#6FD262",
+	"Blue": "#5AC0E7",
+	"Purple": "#C78EFF",
+	"Pink": "#EA86C2",
+	"Red": "#FF7F50",
+	"Gray": "#AAAAAA",
+	// "darkgray": "#454545",
+};
 
 export interface StickyNotesSettings {
 	sticky_notes_folder: string;
 	set_color_in_frontmatter: boolean;
+	default_note_color: string; // Add this line
 }
 
 export const DEFAULT_SETTINGS: StickyNotesSettings = {
 	sticky_notes_folder: "",
 	set_color_in_frontmatter: false,
+	default_note_color: "Yellow", // Change to color name
 }
 
 export default class StickyNotesPlugin extends Plugin {
@@ -89,6 +104,14 @@ export default class StickyNotesPlugin extends Plugin {
 			callback: async () => {
 				await this.activateView();
 				await this.create_new_sticky_note(true);
+			}
+		});
+
+		this.addCommand({
+			id: 'reset-all-sticky-notes-colors',
+			name: 'Reset all sticky notes colors to default',
+			callback: async () => {
+				await this.resetAllStickyNotesColors();
 			}
 		});
 
@@ -143,6 +166,20 @@ export default class StickyNotesPlugin extends Plugin {
 		await this.saveData(this.settings);
 		settings.set(this.settings);
 	}
+
+	async resetAllStickyNotesColors() {
+		// const defaultColor = colors[this.settings.default_note_color];
+		const defaultColor = colors["Yellow"];
+		colorMap.update(currentColorMap => {
+			for (const key in currentColorMap) {
+				currentColorMap[key] = defaultColor;
+			}
+			return currentColorMap;
+		});
+		saveColorMap();
+		const viewInstance = get(store.view);
+		viewInstance?.root?.updateLayoutNextTick();
+	}
 }
 
 
@@ -184,10 +221,35 @@ class StickyNotesSettingsTab extends PluginSettingTab {
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.set_color_in_frontmatter)
-					.onChange(async (value) => {
+					.onChange(async (value: boolean) => {
 						this.plugin.settings.set_color_in_frontmatter = value;
 						await this.plugin.saveSettings();
 					});
 			});
+
+		const defaultColorStore = writable(this.plugin.settings.default_note_color);
+
+		// new Setting(this.containerEl)
+		// 	.setName("Default note color")
+		// 	.setDesc("Specify the default color for new sticky notes.")
+		// 	.addDropdown((dropdown) => {
+		// 		Object.keys(colors).forEach((colorName: string) => {
+		// 			dropdown.addOption(colorName, colorName);
+		// 		});
+		// 		dropdown.setValue(this.plugin.settings.default_note_color)
+		// 			.onChange(async (value) => {
+		// 				this.plugin.settings.default_note_color = value;
+		// 				defaultColorStore.set(colors[value]);
+		// 				await this.plugin.saveSettings();
+		// 			});
+		// 	})
+		// 	.addExtraButton((button) => {
+		// 		button.setIcon("dot")
+		// 			.setTooltip("Selected color")
+		// 			.extraSettingsEl.style.backgroundColor = colors[this.plugin.settings.default_note_color];
+		// 		defaultColorStore.subscribe((color) => {
+		// 			button.extraSettingsEl.style.backgroundColor = color;
+		// 		});
+		// 	});
 	}
 }
